@@ -69,14 +69,11 @@ export default function Home() {
     <div className={styles.homeContainer}>
       <div className={styles.header}>
         <div className={styles.logoContainer}>
-          <div className={styles.logoPlaceholder}>ACE</div>
+          <div className={styles.logoPlaceholder}>A</div>
         </div>
         <div className={styles.collegeInfo}>
           <div className={styles.collegeName}>
             ATTENITIX
-          </div>
-          <div className={styles.collegeDetails}>
-            Dr. M.G.R. Nagar, Hosur - 635130, Krishnagiri District
           </div>
         </div>
       </div>
