@@ -144,6 +144,7 @@
   gap: 1rem;
   margin-bottom: 2.5rem;
   justify-content: center;
+  align-items: center;
   flex-wrap: wrap;
 }
 
@@ -326,7 +327,6 @@
   text-align: center;
   border-radius: 12px;
   color: #f8fafc;
-  /* margin-top: 2rem; */
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
@@ -352,11 +352,15 @@
   .buttonGroup {
     flex-direction: column;
     width: 100%;
-    max-width: 320px;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
   }
 
   .loginButton {
-    width: 100%;
+    width: 80%;
+    max-width: 400px;
+    text-align: center;
   }
 
   .slideshow {
@@ -400,5 +404,9 @@
 
   .slideIcon {
     font-size: 2rem;
+  }
+
+  .loginButton {
+    width: 90%;
   }
 }
