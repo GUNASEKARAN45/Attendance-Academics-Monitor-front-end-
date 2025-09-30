@@ -73,7 +73,7 @@ export default function Home() {
         </div>
         <div className={styles.collegeInfo}>
           <div className={styles.collegeName}>
-            ADHIYAMAAN COLLEGE OF ENGINEERING (Autonomous)
+            ATTENITIX
           </div>
           <div className={styles.collegeDetails}>
             Dr. M.G.R. Nagar, Hosur - 635130, Krishnagiri District
