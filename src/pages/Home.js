@@ -9,60 +9,60 @@ export default function Home() {
   useEffect(() => {
     setIsVisible(true);
     const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % collegeEvents.length);
+      setCurrentSlide((prev) => (prev + 1) % systemFeatures.length);
     }, 4000);
     return () => clearInterval(interval);
   }, []);
 
-  const collegeEvents = [
+  const systemFeatures = [
     {
       id: 1,
-      title: "Technical Symposium 2024",
-      description: "Annual inter-college technical fest showcasing innovation and research",
-      image: "🔬",
-      date: "March 15, 2024",
+      title: "Role-Based Dashboards",
+      description: "Customized dashboards for students, staff, and admins providing tailored views and functionalities",
+      image: "📊",
+      date: "Key Feature",
       color: "#3B82F6",
     },
     {
       id: 2,
-      title: "Industry-Academia Conclave",
-      description: "Collaboration with leading industries for enhanced curriculum development",
-      image: "🤝",
-      date: "February 28, 2024",
+      title: "Automated Attendance",
+      description: "Eliminates manual work and reduces proxy attendance with smart, automated tracking systems",
+      image: "🤖",
+      date: "Core Functionality",
       color: "#10B981",
     },
     {
       id: 3,
-      title: "Research Paper Publication",
-      description: "25 research papers published in international journals this academic year",
-      image: "📄",
-      date: "January 2024",
+      title: "Smart Analytics",
+      description: "In-depth performance analytics and insights based on user attendance and engagement data",
+      image: "📈",
+      date: "Advanced Tool",
       color: "#8B5CF6",
     },
     {
       id: 4,
-      title: "Campus Placement Drive",
-      description: "95% placement record with top recruiters from IT and core engineering sectors",
-      image: "💼",
-      date: "December 2023",
+      title: "Secure and Efficient",
+      description: "Robust security measures ensuring data privacy while streamlining administrative processes",
+      image: "🔒",
+      date: "System Benefit",
       color: "#F59E0B",
     },
     {
       id: 5,
-      title: "Sports Championship",
-      description: "Inter-department sports festival promoting physical fitness and teamwork",
-      image: "⚽",
-      date: "November 2023",
+      title: "Empower Your Institution",
+      description: "Streamline attendance, eliminate errors, and unlock powerful insights for better decision-making",
+      image: "🚀",
+      date: "Our Slogan",
       color: "#EF4444",
     },
   ];
 
   const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % collegeEvents.length);
+    setCurrentSlide((prev) => (prev + 1) % systemFeatures.length);
   };
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + collegeEvents.length) % collegeEvents.length);
+    setCurrentSlide((prev) => (prev - 1 + systemFeatures.length) % systemFeatures.length);
   };
 
   return (
@@ -79,11 +79,9 @@ export default function Home() {
       </div>
 
       <div className={styles.mainContent}>
-        <h1 className={styles.homeTitle}>Attendance Management System</h1>
+        <h1 className={styles.homeTitle}>Automated Attendance and Smart Analytics System</h1>
         <p className={styles.subtitle}>
-          Adhiyamaan College of Engineering, established in 1997, is a premier institution
-          committed to excellence in technical education. Recognized for its academic rigor,
-          industry partnerships, and innovative research culture.
+          Attenitix is a cutting-edge Attendance and Analytics System designed to streamline attendance tracking and provide actionable insights for educational institutions. With real-time data, intuitive dashboards, and secure access for students, staff, and admins, it enhances efficiency and decision-making.
         </p>
 
         <div className={styles.buttonGroup}>
@@ -100,17 +98,17 @@ export default function Home() {
 
         <div className={styles.slideshowContainer}>
           <div className={styles.slideshow}>
-            {collegeEvents.map((event, index) => (
+            {systemFeatures.map((feature, index) => (
               <div
-                key={event.id}
+                key={feature.id}
                 className={`${styles.slide} ${index === currentSlide ? styles.active : ""}`}
-                style={{ background: `linear-gradient(135deg, ${event.color}15, ${event.color}25)` }}
+                style={{ background: `linear-gradient(135deg, ${feature.color}15, ${feature.color}25)` }}
               >
                 <div className={styles.slideContent}>
-                  <div className={styles.slideIcon}>{event.image}</div>
-                  <h3 className={styles.slideTitle}>{event.title}</h3>
-                  <p className={styles.slideDescription}>{event.description}</p>
-                  <div className={styles.slideDate}>{event.date}</div>
+                  <div className={styles.slideIcon}>{feature.image}</div>
+                  <h3 className={styles.slideTitle}>{feature.title}</h3>
+                  <p className={styles.slideDescription}>{feature.description}</p>
+                  <div className={styles.slideDate}>{feature.date}</div>
                 </div>
               </div>
             ))}
@@ -123,7 +121,7 @@ export default function Home() {
             </button>
 
             <div className={styles.slideshowControls}>
-              {collegeEvents.map((_, index) => (
+              {systemFeatures.map((_, index) => (
                 <button
                   key={index}
                   className={`${styles.controlBtn} ${index === currentSlide ? styles.active : ""}`}
@@ -137,9 +135,7 @@ export default function Home() {
 
       <div className={styles.footer}>
         <div className={styles.footerContent}>
-          <strong>Location:</strong> Dr. M.G.R. Nagar, Hosur - 635130, Krishnagiri District, Tamil
-          Nadu, India<br />
-          <strong>Established:</strong> 1997 | <strong>Powered by:</strong> Team Victoreign
+          <strong>Powered by:</strong> Team Victoreign
         </div>
       </div>
     </div>
