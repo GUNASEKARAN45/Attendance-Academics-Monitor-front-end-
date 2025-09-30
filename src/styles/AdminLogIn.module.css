@@ -1,0 +1,275 @@
+/* KEYFRAMES */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shine {
+  0% {
+    transform: translateX(-100%) rotate(45deg);
+  }
+  100% {
+    transform: translateX(100%) rotate(45deg);
+  }
+}
+
+/* GLOBAL STYLES */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body,
+html {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #1f2937; /* Matches Home.jsx dark background */
+  min-height: 100vh;
+  color: #f3f4f6; /* Matches Home.jsx text color */
+  overflow-x: hidden;
+  line-height: 1.5;
+}
+
+.adminLoginContainer {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 1rem;
+}
+
+.loginCard {
+  background: #374151; /* Matches Home.jsx header and carousel background */
+  border-radius: 10px;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Matches Home.jsx shadow */
+  border: 1px solid #4b5563; /* Matches Home.jsx border */
+  width: 100%;
+  max-width: 420px; /* Matches StudentLogin.jsx */
+  animation: fadeIn 0.7s ease-out; /* Matches Home.jsx animation */
+  margin: 1rem;
+  transition: box-shadow 0.3s ease;
+}
+
+.loginCard:hover {
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.3); /* Matches Home.jsx header hover */
+}
+
+.loginHeader {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.loginLogo {
+  width: 50px; /* Matches Home.jsx logo size */
+  height: 50px;
+  background: #8b5cf6; /* Matches Home.jsx admin-button color */
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 0.8rem;
+  box-shadow: 0 3px 10px rgba(139, 92, 246, 0.3); /* Adjusted for purple */
+  position: relative;
+  overflow: hidden;
+}
+
+.loginLogo::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: shine 3s ease-in-out infinite; /* Matches Home.jsx shine effect */
+}
+
+.logoText {
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 1px;
+  z-index: 1;
+}
+
+.loginTitle {
+  font-size: 1.3rem; /* Matches Home.jsx college-name size */
+  font-weight: 700;
+  color: #8b5cf6; /* Matches Home.jsx admin-button color */
+  margin-bottom: 0.4rem;
+  line-height: 1.2;
+}
+
+.loginSubtitle {
+  font-size: 0.8rem; /* Matches Home.jsx college-details size */
+  color: #9ca3af; /* Matches Home.jsx secondary text color */
+  font-weight: 400;
+}
+
+.formGroup {
+  margin-bottom: 1.2rem;
+}
+
+.formLabel {
+  display: block;
+  margin-bottom: 0.4rem;
+  color: #f3f4f6; /* Matches Home.jsx text color */
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+.formInput {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #4b5563; /* Matches Home.jsx border */
+  border-radius: 6px; /* Matches Home.jsx button radius */
+  font-size: 0.85rem;
+  background: #2d3748; /* Matches Home.jsx carousel background */
+  color: #f3f4f6; /* Matches Home.jsx text color */
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  box-sizing: border-box;
+}
+
+.formInput:focus {
+  outline: none;
+  border-color: #8b5cf6; /* Matches Home.jsx admin-button color */
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+}
+
+.formInput::placeholder {
+  color: #9ca3af; /* Matches Home.jsx secondary text color */
+  font-size: 0.85rem;
+}
+
+.formInput:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.captchaContainer {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: #2d3748; /* Matches Home.jsx carousel background */
+  border-radius: 8px;
+  border: 1px solid #4b5563; /* Matches Home.jsx border */
+}
+
+.captchaTitle {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #f3f4f6; /* Matches Home.jsx text color */
+  margin-bottom: 0.6rem;
+  text-align: center;
+}
+
+.loginButton {
+  width: 100%;
+  padding: 0.8rem;
+  background: #8b5cf6; /* Matches Home.jsx admin-button background */
+  color: #ffffff;
+  border: none;
+  border-radius: 6px; /* Matches Home.jsx button radius */
+  font-size: 0.9rem; /* Matches Home.jsx button font size */
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.loginButton:hover:not(:disabled) {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Matches Home.jsx button hover */
+  filter: brightness(1.1); /* Matches Home.jsx button hover */
+}
+
+.loginButton:active:not(:disabled) {
+  transform: scale(0.95); /* Matches Home.jsx button active */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); /* Matches Home.jsx button active */
+  filter: brightness(0.9); /* Matches Home.jsx button active */
+}
+
+.loginButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.buttonLoading {
+  position: relative;
+  color: transparent;
+}
+
+.buttonLoading::after {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  top: 50%;
+  left: 50%;
+  margin-left: -9px;
+  margin-top: -9px;
+  border: 2px solid transparent;
+  border-top: 2px solid #ffffff;
+  border-radius: 50%;
+  animation: buttonSpin 1s linear infinite;
+}
+
+@keyframes buttonSpin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loginFooter {
+  text-align: center;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #4b5563; /* Matches Home.jsx border */
+}
+
+.footerText {
+  font-size: 0.8rem; /* Matches Home.jsx footer font size */
+  color: #9ca3af; /* Matches Home.jsx secondary text color */
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+/* RESPONSIVE */
+@media (max-width: 480px) {
+  .loginCard {
+    padding: 1.5rem;
+    margin: 0.8rem;
+  }
+
+  .loginTitle {
+    font-size: 1.2rem;
+  }
+
+  .loginSubtitle {
+    font-size: 0.75rem;
+  }
+
+  .formInput {
+    padding: 0.7rem;
+    font-size: 0.8rem;
+  }
+
+  .captchaContainer {
+    padding: 0.8rem;
+    margin: 1.2rem 0;
+  }
+
+  .loginButton {
+    padding: 0.7rem;
+    font-size: 0.85rem;
+  }
+}
