@@ -14,6 +14,7 @@ const StaffDashboard = () => {
   const [currentWeek, setCurrentWeek] = useState(0);
   const [showStudentPopup, setShowStudentPopup] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [showEditAttendance, setShowEditAttendance] = useState(null);
   const canvasRef = useRef(null);
 
   // Mock staff data
@@ -24,29 +25,44 @@ const StaffDashboard = () => {
     designation: "Assistant Professor"
   };
 
-  // Mock today's attendance data with flagged (late) students
-  const todayAttendanceData = [
+  // Adjusted mock today's attendance data
+  const [todayAttendanceData, setTodayAttendanceData] = useState([
     { regNo: "EC001", status: true },
-    { regNo: "EC002", status: false },
+    { regNo: "EC002", status: true },
     { regNo: "EC003", status: true },
     { regNo: "EC004", status: true, late: true },
     { regNo: "EC005", status: false },
     { regNo: "EC006", status: true },
-    { regNo: "EC007", status: true, late: true },
+    { regNo: "EC007", status: true },
     { regNo: "EC008", status: false },
     { regNo: "EC009", status: true },
     { regNo: "EC010", status: true },
-    { regNo: "EC011", status: false, late: true },
+    { regNo: "EC011", status: true },
     { regNo: "EC012", status: true },
     { regNo: "EC013", status: true },
     { regNo: "EC014", status: false },
-    { regNo: "EC015", status: true },
-  ];
+    { regNo: "EC015", status: false },
+    { regNo: "EC016", status: true },
+    { regNo: "EC017", status: true, late: true },
+    { regNo: "EC018", status: false },
+    { regNo: "EC019", status: true },
+    { regNo: "EC020", status: true },
+    { regNo: "EC021", status: true },
+    { regNo: "EC022", status: true },
+    { regNo: "EC023", status: false },
+    { regNo: "EC024", status: true },
+    { regNo: "EC025", status: true },
+    { regNo: "EC026", status: true, late: true },
+    { regNo: "EC027", status: false },
+    { regNo: "EC028", status: true },
+    { regNo: "EC029", status: true },
+    { regNo: "EC030", status: false },
+  ]);
 
   // Calculate attendance stats
   const totalStudents = todayAttendanceData.length;
   const presentCount = todayAttendanceData.filter(s => s.status).length;
-  const lateCount = todayAttendanceData.filter(s => s.late).length;
+  const lateCount = todayAttendanceData.filter(s => s.late && s.status).length;
   const absentCount = totalStudents - presentCount;
 
   // Mock subject-wise percentage
@@ -58,17 +74,8 @@ const StaffDashboard = () => {
     { name: 'Signals & Systems', percentage: 100 },
   ];
 
-  // Mock combined attendance data with monthly labels
+  // Mock combined attendance data without daily
   const combinedAttendanceData = {
-    daily: {
-      labels: ['Period 1', 'Period 2', 'Period 3', 'Period 4', 'Period 5', 'Period 6', 'Period 7'],
-      data: {
-        'Web Development': [90, 85, 95, 80, 88, 92, 87],
-        'Data Structures': [88, 82, 90, 78, 85, 90, 85],
-        'Database Systems': [92, 87, 93, 85, 90, 95, 89],
-        'Operating Systems': [85, 80, 88, 75, 82, 88, 84],
-      }
-    },
     weekly: {
       labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
       data: {
@@ -114,7 +121,7 @@ const StaffDashboard = () => {
     },
   ];
 
-  // Mock insights with more added
+  // Mock insights
   const attendanceInsights = [
     { message: 'Students continuously absent on Friday and Saturday' },
     { message: 'Less number of students present in the last week' },
@@ -142,8 +149,7 @@ const StaffDashboard = () => {
 
   useEffect(() => {
     setNotifications(mockNotifications);
-    drawChart();
-  }, [timeFilter, currentWeek, selectedSubject]);
+  }, []);
 
   const deleteNotification = (id) => {
     setNotifications(notifications.filter(n => n.id !== id));
@@ -156,35 +162,71 @@ const StaffDashboard = () => {
   const unreadCount = notifications.filter(n => !n.read).length;
 
   const drawChart = () => {
-    const ctx = canvasRef.current.getContext('2d');
-    ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+    const canvas = canvasRef.current;
+    if (!canvas) {
+      console.error('Canvas not found');
+      return;
+    }
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      console.error('Canvas context not available');
+      return;
+    }
+
+    canvas.width = 500;
+    canvas.height = 350;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     const data = combinedAttendanceData[timeFilter];
-    const labels = data.labels;
-    const values = data.data ? data.data[selectedSubject] : data.data; // Adjust for non-object data if needed
+    if (!data || !data.labels || !data.data) {
+      console.error('Invalid data for chart');
+      return;
+    }
 
+    const labels = data.labels;
+    const values = data.data[selectedSubject] || [];
+
+    if (!values.length) {
+      console.error('No values for selected subject:', selectedSubject);
+      return;
+    }
+
+    const maxY = Math.max(...values, 100);
+    const chartWidth = canvas.width - 100;
+    const chartHeight = canvas.height - 70;
+
+    // Fill area
+    ctx.beginPath();
+    ctx.moveTo(50, chartHeight + 20);
+    values.forEach((value, index) => {
+      const x = 50 + (index * (chartWidth / (values.length - 1)));
+      const y = 20 + chartHeight - (value / maxY) * chartHeight;
+      ctx.lineTo(x, y);
+    });
+    ctx.lineTo(50 + chartWidth, chartHeight + 20);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(59, 130, 246, 0.2)';
+    ctx.fill();
+
+    // Line
     ctx.beginPath();
     ctx.strokeStyle = '#3b82f6';
     ctx.lineWidth = 2;
-    ctx.fillStyle = 'rgba(59, 130, 246, 0.2)';
-    ctx.moveTo(50, 300 - (values[0] / 100) * 250);
-    let maxY = Math.max(...values);
-
     values.forEach((value, index) => {
-      const x = 50 + (index * (450 / (values.length - 1)));
-      const y = 300 - (value / maxY) * 250;
-      ctx.lineTo(x, y);
+      const x = 50 + (index * (chartWidth / (values.length - 1)));
+      const y = 20 + chartHeight - (value / maxY) * chartHeight;
+      if (index === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
     });
-
-    ctx.lineTo(500 - 50, 300);
-    ctx.closePath();
-    ctx.fill();
     ctx.stroke();
 
+    // Points and labels
     ctx.fillStyle = '#3b82f6';
     values.forEach((value, index) => {
-      const x = 50 + (index * (450 / (values.length - 1)));
-      const y = 300 - (value / maxY) * 250;
+      const x = 50 + (index * (chartWidth / (labels.length - 1)));
+      const y = 20 + chartHeight - (value / maxY) * chartHeight;
       ctx.beginPath();
       ctx.arc(x, y, 4, 0, Math.PI * 2);
       ctx.fill();
@@ -193,28 +235,30 @@ const StaffDashboard = () => {
       ctx.fillText(value + '%', x - 10, y - 5);
     });
 
+    // Grid lines
     ctx.strokeStyle = '#4b5563';
     ctx.setLineDash([5, 5]);
     for (let i = 0; i <= 5; i++) {
-      const y = 300 - (i * 50);
+      const y = 20 + chartHeight - (i / 5) * chartHeight;
       ctx.beginPath();
       ctx.moveTo(50, y);
-      ctx.lineTo(500 - 50, y);
+      ctx.lineTo(50 + chartWidth, y);
       ctx.stroke();
       ctx.fillStyle = '#94a3b8';
-      ctx.fillText((i * 20) + '%', 20, y + 5);
+      ctx.fillText((i * (maxY / 5)).toFixed(0) + '%', 10, y + 5);
     }
-
     ctx.setLineDash([]);
+
+    // X labels
     ctx.fillStyle = '#94a3b8';
     labels.forEach((label, index) => {
-      const x = 50 + (index * (450 / (labels.length - 1)));
-      ctx.fillText(label, x - 10, 320); // Adjusted to 320 for visibility
+      const x = 50 + (index * (chartWidth / (labels.length - 1)));
+      ctx.fillText(label, x - 10, canvas.height - 10);
     });
 
     if (timeFilter === 'monthly') {
       const month = new Date(2025, 8 + currentWeek, 1).toLocaleString('default', { month: 'long' });
-      ctx.fillText(month, 250, 330); // Adjusted to 330
+      ctx.fillText(month, canvas.width / 2 - 20, canvas.height - 10);
     }
   };
 
@@ -273,7 +317,69 @@ const StaffDashboard = () => {
               </ul>
             </div>
           </div>
-          <button className={styles.closeBtn} onClick={() => { setShowStudentPopup(false); setSelectedStudent(null); }}>Close</button>
+          <button className={`${styles.closeBtn} ${styles.redCloseBtn}`} onClick={() => { setShowStudentPopup(false); setSelectedStudent(null); }}>Close</button>
+        </div>
+      </div>
+    );
+  };
+
+  const EditAttendancePopup = ({ student, onClose }) => {
+    const handleStatusChange = (newStatus, isLate = false) => {
+      setTodayAttendanceData(prev =>
+        prev.map(s =>
+          s.regNo === student.regNo
+            ? { ...s, status: newStatus, late: isLate ? s.late : false }
+            : s
+        )
+      );
+      onClose();
+    };
+
+    return (
+      <div className={styles.studentPopupOverlay}>
+        <div className={styles.studentPopup}>
+          <h3>Edit Attendance for {student.regNo}</h3>
+          <div className={styles.profileActions}>
+            {student.status ? (
+              <>
+                <button
+                  className={styles.saveBtn}
+                  onClick={() => handleStatusChange(false)}
+                >
+                  Mark as Absent
+                </button>
+                {student.late && (
+                  <button
+                    className={styles.saveBtn}
+                    onClick={() => handleStatusChange(true, false)}
+                  >
+                    Mark as Present (Not Late)
+                  </button>
+                )}
+              </>
+            ) : (
+              <>
+                <button
+                  className={styles.saveBtn}
+                  onClick={() => handleStatusChange(true, false)}
+                >
+                  Mark as Present
+                </button>
+                <button
+                  className={styles.saveBtn}
+                  onClick={() => handleStatusChange(true, true)}
+                >
+                  Mark as Late
+                </button>
+              </>
+            )}
+            <button
+              className={`${styles.closeBtn} ${styles.redCloseBtn}`}
+              onClick={onClose}
+            >
+              Cancel
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -328,10 +434,15 @@ const StaffDashboard = () => {
       </div>
       <div className={styles.attendanceGrid}>
         {todayAttendanceData.map((student, index) => (
-          <div key={index} className={styles.studentIcon}>
+          <div
+            key={index}
+            className={styles.studentIcon}
+            onClick={() => setShowEditAttendance(student)}
+            style={{ cursor: 'pointer' }}
+          >
             <div
-              className={`${styles.icon} ${student.status ? styles.present : student.late ? styles.late : styles.absent}`}
-              style={{ backgroundImage: `ur[](https://static.thenounproject.com/png/1594252-200.png)`, backgroundSize: 'cover' }}
+              className={`${styles.icon} ${student.status ? (student.late ? styles.late : styles.present) : styles.absent}`}
+              style={{ backgroundImage: `url(https://static.thenounproject.com/png/1594252-200.png)`, backgroundSize: 'cover' }}
             >
               {student.late && <span className={styles.tooltip}>Late Comer</span>}
             </div>
@@ -369,19 +480,23 @@ const StaffDashboard = () => {
     const handlePrev = () => setCurrentWeek(prev => Math.max(prev - 1, 0));
     const handleNext = () => setCurrentWeek(prev => prev + 1);
 
+    useEffect(() => {
+      if (activeTab === 'attendance' && canvasRef.current) {
+        // Use setTimeout to ensure canvas is ready
+        const timer = setTimeout(() => {
+          console.log('Drawing chart:', { timeFilter, selectedSubject });
+          drawChart();
+        }, 0);
+        return () => clearTimeout(timer);
+      }
+    }, [activeTab, timeFilter, currentWeek, selectedSubject]);
+
     return (
       <div className={styles.attendanceChart}>
         <div className={styles.chartHeader}>
           <h3>{timeFilter.charAt(0).toUpperCase() + timeFilter.slice(1)} Combined Attendance</h3>
           <div className={styles.filters}>
-            <select value={selectedSubject} onChange={(e) => setSelectedSubject(e.target.value)} className={styles.filterSelect}>
-              <option>Web Development</option>
-              <option>Data Structures</option>
-              <option>Database Systems</option>
-              <option>Operating Systems</option>
-            </select>
             <select value={timeFilter} onChange={(e) => setTimeFilter(e.target.value)} className={styles.filterSelect}>
-              <option value="daily">Daily</option>
               <option value="weekly">Weekly</option>
               <option value="monthly">Monthly</option>
             </select>
@@ -393,8 +508,8 @@ const StaffDashboard = () => {
             )}
           </div>
         </div>
-        <div style={{ position: 'relative', width: '500px', height: '350px' }}>
-          <canvas ref={canvasRef} width="500" height="350"></canvas>
+        <div style={{ position: 'relative', width: '900px', height: '400px' }}>
+          <canvas ref={canvasRef} width="500" height="380"></canvas>
         </div>
       </div>
     );
@@ -402,14 +517,13 @@ const StaffDashboard = () => {
 
   const MarksTable = () => {
     const handleSave = (index) => {
-      const updatedStudents = [...studentsData];
-      const ut1 = Math.min(50, Math.max(0, parseInt(document.getElementsByTagName('input')[index * 6 + 2].value) || 0));
-      const ut2 = Math.min(50, Math.max(0, parseInt(document.getElementsByTagName('input')[index * 6 + 3].value) || 0));
-      const ut3 = Math.min(50, Math.max(0, parseInt(document.getElementsByTagName('input')[index * 6 + 4].value) || 0));
-      const model1 = Math.min(100, Math.max(0, parseInt(document.getElementsByTagName('input')[index * 6 + 5].value) || 0));
-      const sem = Math.min(100, Math.max(0, parseInt(document.getElementsByTagName('input')[index * 6 + 6].value) || 0));
-      updatedStudents[index].marks = { ut1, ut2, ut3, model1, sem };
-      // Here you would typically update state or API
+      const inputs = document.querySelectorAll(`.${styles.markInput}`);
+      const ut1 = Math.min(50, Math.max(0, parseInt(inputs[index * 5].value) || 0));
+      const ut2 = Math.min(50, Math.max(0, parseInt(inputs[index * 5 + 1].value) || 0));
+      const ut3 = Math.min(50, Math.max(0, parseInt(inputs[index * 5 + 2].value) || 0));
+      const model1 = Math.min(100, Math.max(0, parseInt(inputs[index * 5 + 3].value) || 0));
+      const sem = Math.min(100, Math.max(0, parseInt(inputs[index * 5 + 4].value) || 0));
+      // Update studentsData or API here
       alert('Marks saved!');
     };
 
@@ -450,18 +564,31 @@ const StaffDashboard = () => {
 
   const AcademicInsights = () => (
     <div className={styles.academicInsights}>
-      <h3>Attendance Insights</h3>
-      <ul className={styles.insightsList}>
-        {attendanceInsights.map((insight, index) => (
-          <li key={index}>{insight.message}</li>
-        ))}
-      </ul>
-      <h3>Marks Insights</h3>
-      <ul className={styles.insightsList}>
-        {marksInsights.map((insight, index) => (
-          <li key={index}>{insight.message}</li>
-        ))}
-      </ul>
+      <h3>Academic Insights</h3>
+      <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
+        <div style={{ flex: 1, minWidth: '300px' }}>
+          <h4 style={{ fontSize: '1rem', color: '#bfdbfe', marginBottom: '0.8rem', borderBottom: '1px solid #334155', paddingBottom: '0.5rem' }}>Attendance Insights</h4>
+          <ul className={styles.insightsList} style={{ listStyle: 'none', padding: 0 }}>
+            {attendanceInsights.map((insight, index) => (
+              <li key={index} style={{ marginBottom: '0.8rem', padding: '0.8rem', background: '#374151', borderRadius: '8px', boxShadow: '0 2px 6px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span style={{ color: '#3b82f6', fontSize: '1.2rem' }}>•</span>
+                {insight.message}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div style={{ flex: 1, minWidth: '300px' }}>
+          <h4 style={{ fontSize: '1rem', color: '#bfdbfe', marginBottom: '0.8rem', borderBottom: '1px solid #334155', paddingBottom: '0.5rem' }}>Marks Insights</h4>
+          <ul className={styles.insightsList} style={{ listStyle: 'none', padding: 0 }}>
+            {marksInsights.map((insight, index) => (
+              <li key={index} style={{ marginBottom: '0.8rem', padding: '0.8rem', background: '#374151', borderRadius: '8px', boxShadow: '0 2px 6px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span style={{ color: '#3b82f6', fontSize: '1.2rem' }}>•</span>
+                {insight.message}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
     </div>
   );
 
@@ -539,7 +666,7 @@ const StaffDashboard = () => {
     useEffect(() => {
       const currentStart = periodStartTimes[period];
       const currentIndex = periodOrder.indexOf(period);
-      const nextStart = currentIndex < periodOrder.length - 1 ? periodStartTimes[periodOrder[currentIndex + 1]] : { hour: 4, min: 0, ampm: 'PM' }; // Assume end of day for last period
+      const nextStart = currentIndex < periodOrder.length - 1 ? periodStartTimes[periodOrder[currentIndex + 1]] : { hour: 4, min: 0, ampm: 'PM' };
 
       let currentHour = currentStart.hour;
       if (currentStart.ampm === 'PM' && currentStart.hour !== 12) currentHour += 12;
@@ -642,7 +769,7 @@ const StaffDashboard = () => {
         {classType === 'online' && (
           <div className={styles.qrCode}>
             <div className={styles.qrPlaceholder}>
-              {qrCode ? <QRCodeCanvas value={qrCode} size={128} /> : 'Generate QR Code'}
+              {qrCode ? <QRCodeCanvas value={qrCode} size={140} style={{ width: '100%', height: '100%', objectFit: 'contain' }} /> : 'Generate QR Code'}
             </div>
             <button className={styles.shareQrBtn} onClick={generateQrCode} disabled={!!qrCode}>
               {qrCode ? 'Share QR' : 'Generate QR'}
@@ -668,6 +795,9 @@ const StaffDashboard = () => {
             <button className={`${styles.tabBtn} ${activeTab === 'attendance' ? styles.active : ''}`} onClick={() => setActiveTab('attendance')}>
               <i className="fas fa-chart-bar"></i> Attendance Details
             </button>
+            <button className={`${styles.tabBtn} ${activeTab === 'takeAttendance' ? styles.active : ''}`} onClick={() => setActiveTab('takeAttendance')}>
+              <i className="fas fa-check"></i> Take Attendance
+            </button>
             <button className={`${styles.tabBtn} ${activeTab === 'marks' ? styles.active : ''}`} onClick={() => setActiveTab('marks')}>
               <i className="fas fa-book"></i> Marks Entry
             </button>
@@ -676,9 +806,6 @@ const StaffDashboard = () => {
             </button>
             <button className={`${styles.tabBtn} ${activeTab === 'studentInsights' ? styles.active : ''}`} onClick={() => setActiveTab('studentInsights')}>
               <i className="fas fa-users"></i> Student Insights
-            </button>
-            <button className={`${styles.tabBtn} ${activeTab === 'takeAttendance' ? styles.active : ''}`} onClick={() => setActiveTab('takeAttendance')}>
-              <i className="fas fa-check"></i> Take Attendance
             </button>
           </div>
           <Notifications />
@@ -722,16 +849,6 @@ const StaffDashboard = () => {
                   <option>Operating Systems</option>
                 </select>
               </div>
-              {activeTab === 'attendance' && (
-                <div className={styles.filterGroup}>
-                  <label>View:</label>
-                  <select value={timeFilter} onChange={(e) => setTimeFilter(e.target.value)} className={styles.filterSelect}>
-                    <option value="daily">Daily</option>
-                    <option value="weekly">Weekly</option>
-                    <option value="monthly">Monthly</option>
-                  </select>
-                </div>
-              )}
             </div>
           </div>
 
@@ -751,6 +868,7 @@ const StaffDashboard = () => {
 
       {showProfilePopup && <ProfilePopup />}
       {showStudentPopup && <StudentPopup />}
+      {showEditAttendance && <EditAttendancePopup student={showEditAttendance} onClose={() => setShowEditAttendance(null)} />}
     </div>
   );
 };

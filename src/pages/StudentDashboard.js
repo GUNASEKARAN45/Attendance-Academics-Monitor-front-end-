@@ -722,6 +722,7 @@ const StudentDashboard = () => {
             title="Manage To-Do List"
           >
             <span className={styles.todoIcon}>&#128203;</span>
+            <p>Add your tasks here!</p>
           </button>
         </div>
         <div className={styles.examSection}>

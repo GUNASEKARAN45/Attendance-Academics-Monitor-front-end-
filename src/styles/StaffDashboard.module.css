@@ -351,19 +351,16 @@ label {
 }
 
 .icon.present {
-  border-color: #10b981;
-  background-color: rgba(16, 185, 129, 0.2);
+  border-color: #064d35;
+  background-color: rgba(94, 235, 153, 0.911);
 }
 
 .icon.absent {
   border-color: #ef4444;
-  background-color: rgba(239, 68, 68, 0.2);
+  background-color: rgba(247, 86, 86, 0.87);
 }
 
-.icon.late {
-  border-color: #f59e0b;
-  background-color: rgba(245, 158, 11, 0.2);
-}
+
 
 .studentIcon:hover .tooltip {
   opacity: 1;
@@ -536,7 +533,7 @@ canvas {
   background: #1e293b;
   border-radius: 8px;
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
-  width: 500px !important;
+  width: 100% !important;
   height: 350px !important; /* Adjusted height to accommodate labels */
 }
 
@@ -597,7 +594,20 @@ tr:nth-child(even) {
 tr:hover {
   background: #6b7280;
 }
+.redCloseBtn {
+  background: #ef4444;
+}
 
+.redCloseBtn:hover {
+  background: #dc2626;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Ensure late icon has correct styling */
+.icon.late {
+  border-color: #f59e0b;
+  background-color: rgba(202, 154, 72, 0.897);
+}
 .markInput {
   width: 60px;
   padding: 0.4rem;
@@ -618,6 +628,15 @@ tr:hover {
   border-color: #ef4444;
 }
 
+.markInput::-webkit-inner-spin-button,
+.markInput::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.markInput {
+  -moz-appearance: textfield;
+}
 .saveBtn {
   background: #10b981;
   color: #ffffff;
