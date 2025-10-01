@@ -6,7 +6,7 @@ import StaffLogin from "./pages/StaffLogin";
 import AdminLogin from "./pages/AdminLogin";
 import StudentDashboard from "./pages/StudentDashboard";
 import StaffDashboard from "./pages/StaffDasboard";
-import AdminDashboard from "./pages/AdminPage";
+import AdminDashboard from "./pages/AdminDashboard";
 
 export default function App() {
   return (
