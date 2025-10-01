@@ -1,6 +1,133 @@
-import React, { useState, useEffect, useRef } from 'react';
-import styles from '../styles/AdminDashboard.module.css'; // Reuse StaffDashboard styles for similarity
+import React, { useState, useEffect, useRef, memo } from 'react';
+import styles from '../styles/AdminDashboard.module.css';
 import { api, setAuthToken } from "../Api";
+
+// Memoized child components to prevent unnecessary re-renders
+const AddStudent = memo(({ studentReg, setStudentReg, studentName, setStudentName, studentPass, setStudentPass, studentDegree, setStudentDegree, studentYear, setStudentYear, studentDept, setStudentDept, studentSection, setStudentSection, studentDOB, setStudentDOB, studentEmail, setStudentEmail, studentPhone, setStudentPhone, yearOptions, departmentOptions, allSections, addStudent }) => (
+  <div className={styles.adminSection}>
+    <div className={styles.formGroup}>
+      <label>Registration Number</label>
+      <input className={styles.filterSelect} placeholder="Registration number" value={studentReg} onChange={e => setStudentReg(e.target.value)} required />
+      <label>Student Name</label>
+      <input className={styles.filterSelect} placeholder="Student name" value={studentName} onChange={e => setStudentName(e.target.value)} required />
+      <label>Password</label>
+      <input className={styles.filterSelect} type="password" placeholder="Password" value={studentPass} onChange={e => setStudentPass(e.target.value)} required />
+      <label>Degree</label>
+      <select className={styles.filterSelect} value={studentDegree} onChange={e => setStudentDegree(e.target.value)} required>
+        <option value="">Select Degree</option>
+        <option value="BE/BTech">BE/BTech</option>
+        <option value="ME/MTech">ME/MTech</option>
+        <option value="MCA">MCA</option>
+        <option value="MBA">MBA</option>
+      </select>
+      <label>Year</label>
+      <select className={styles.filterSelect} value={studentYear} onChange={e => setStudentYear(e.target.value)} required>
+        <option value="">Select Year</option>
+        {yearOptions.map(y => <option key={y} value={y}>{y}</option>)}
+      </select>
+      <label>Department</label>
+      <select className={styles.filterSelect} value={studentDept} onChange={e => setStudentDept(e.target.value)} required>
+        <option value="">Select Department</option>
+        {departmentOptions.map(d => <option key={d} value={d}>{d}</option>)}
+      </select>
+      <label>Section</label>
+      <select className={styles.filterSelect} value={studentSection} onChange={e => setStudentSection(e.target.value)} required>
+        <option value="">Select Section</option>
+        {allSections.map(s => <option key={s} value={s}>{s}</option>)}
+      </select>
+      <label>Date of Birth</label>
+      <input className={styles.filterSelect} type="date" value={studentDOB} onChange={e => setStudentDOB(e.target.value)} required />
+      <label>Email</label>
+      <input className={styles.filterSelect} type="email" placeholder="Email" value={studentEmail} onChange={e => setStudentEmail(e.target.value)} required />
+      <label>Phone Number</label>
+      <input className={styles.filterSelect} type="tel" placeholder="Phone Number" value={studentPhone} onChange={e => setStudentPhone(e.target.value)} required />
+      <button className={styles.saveBtn} onClick={addStudent}>Add Student</button>
+    </div>
+  </div>
+));
+
+const AddStaff = memo(({ staffId, setStaffId, staffName, setStaffName, staffPass, setStaffPass, staffEmail, setStaffEmail, staffPhone, setStaffPhone, staffDepartment, setStaffDepartment, staffDesignation, setStaffDesignation, allDepartments, addStaff }) => (
+  <div className={styles.adminSection}>
+    <div className={styles.formGroup}>
+      <label>Staff ID</label>
+      <input className={styles.filterSelect} placeholder="Staff ID" value={staffId} onChange={e => setStaffId(e.target.value)} required />
+      <label>Staff Name</label>
+      <input className={styles.filterSelect} placeholder="Staff name" value={staffName} onChange={e => setStaffName(e.target.value)} required />
+      <label>Password</label>
+      <input className={styles.filterSelect} type="password" placeholder="Password" value={staffPass} onChange={e => setStaffPass(e.target.value)} required />
+      <label>Email</label>
+      <input className={styles.filterSelect} type="email" placeholder="Email" value={staffEmail} onChange={e => setStaffEmail(e.target.value)} required />
+      <label>Phone Number</label>
+      <input className={styles.filterSelect} type="tel" placeholder="Phone Number" value={staffPhone} onChange={e => setStaffPhone(e.target.value)} required />
+      <label>Department</label>
+      <select className={styles.filterSelect} value={staffDepartment} onChange={e => setStaffDepartment(e.target.value)} required>
+        <option value="">Select Department</option>
+        {allDepartments.map(d => <option key={d} value={d}>{d}</option>)}
+      </select>
+      <label>Designation</label>
+      <select className={styles.filterSelect} value={staffDesignation} onChange={e => setStaffDesignation(e.target.value)} required>
+        <option value="">Select Designation</option>
+        <option value="Assistant Professor">Assistant Professor</option>
+        <option value="Associate Professor">Associate Professor</option>
+        <option value="Professor">Professor</option>
+      </select>
+      <button className={styles.saveBtn} onClick={addStaff}>Add Staff</button>
+    </div>
+  </div>
+));
+
+const AssignStaff = memo(({ assignStaffId, setAssignStaffId, assignStaffName, setAssignStaffName, assignDept, setAssignDept, assignYear, setAssignYear, assignSection, setAssignSection, assignSubject, setAssignSubject, allStaffs, allDepartments, allYears, allSections, allSubjects, assignStaff }) => (
+  <div className={styles.adminSection}>
+    <div className={styles.formGroup}>
+      <label>Staff</label>
+      <select className={styles.filterSelect} value={assignStaffId} onChange={e => {
+        const staff = allStaffs.find(s => s.staffId === e.target.value);
+        setAssignStaffId(staff?.staffId || '');
+        setAssignStaffName(staff?.name || '');
+      }} required>
+        <option value="">Select Staff</option>
+        {allStaffs.map(s => <option key={s.staffId} value={s.staffId}>{s.name} ({s.staffId})</option>)}
+      </select>
+      <label>Department</label>
+      <select className={styles.filterSelect} value={assignDept} onChange={e => setAssignDept(e.target.value)} required>
+        <option value="">Select Department</option>
+        {allDepartments.map(d => <option key={d} value={d}>{d}</option>)}
+      </select>
+      <label>Year</label>
+      <select className={styles.filterSelect} value={assignYear} onChange={e => setAssignYear(e.target.value)} required>
+        <option value="">Select Year</option>
+        {allYears.map(y => <option key={y} value={y}>{y}</option>)}
+      </select>
+      <label>Section</label>
+      <select className={styles.filterSelect} value={assignSection} onChange={e => setAssignSection(e.target.value)} required>
+        <option value="">Select Section</option>
+        {allSections.map(s => <option key={s} value={s}>{s}</option>)}
+      </select>
+      <label>Subject</label>
+      <select className={styles.filterSelect} value={assignSubject} onChange={e => setAssignSubject(e.target.value)} required>
+        <option value="">Select Subject</option>
+        {allSubjects.map(sub => <option key={sub} value={sub}>{sub}</option>)}
+      </select>
+      <button className={styles.saveBtn} onClick={assignStaff}>Assign Staff</button>
+    </div>
+  </div>
+));
+
+const SendNotification = memo(({ notificationTarget, setNotificationTarget, notificationMessage, setNotificationMessage, sendNotification }) => (
+  <div className={styles.adminSection}>
+    <div className={styles.formGroup}>
+      <label>Target</label>
+      <select className={styles.filterSelect} value={notificationTarget} onChange={e => setNotificationTarget(e.target.value)} required>
+        <option value="student">To Students</option>
+        <option value="staff">To Staff</option>
+        <option value="both">To Both</option>
+      </select>
+      <label>Message</label>
+      <textarea className={styles.filterSelect} style={{ height: '120px' }} placeholder="Notification Message" value={notificationMessage} onChange={e => setNotificationMessage(e.target.value)} required />
+      <button className={styles.saveBtn} onClick={sendNotification}>Send Notification</button>
+    </div>
+  </div>
+));
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('attendance');
@@ -9,23 +136,24 @@ const AdminDashboard = () => {
   const [selectedSection, setSelectedSection] = useState('');
   const [selectedSubject, setSelectedSubject] = useState('');
   const [selectedStaff, setSelectedStaff] = useState('');
-  const [filterType, setFilterType] = useState('department'); // 'department' or 'staff'
+  const [filterType, setFilterType] = useState('department');
   const [showProfilePopup, setShowProfilePopup] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [timeFilter, setTimeFilter] = useState('weekly');
   const [currentWeek, setCurrentWeek] = useState(0);
   const [showStudentPopup, setShowStudentPopup] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [showNotifications, setShowNotifications] = useState(false);
 
   // Admin-specific states
   const [token] = useState(localStorage.getItem("token") || "");
   const [allStaffs, setAllStaffs] = useState([]);
-  const [allDepartments] = useState(['ECE', 'CSE', 'MECH']); // Mock departments
+  const [allDepartments] = useState(['ECE', 'CSE', 'MECH']);
   const [departmentOptions, setDepartmentOptions] = useState([]);
-  const [allYears] = useState(['1', '2', '3', '4']); // Mock years
+  const [allYears] = useState(['1', '2', '3', '4']);
   const [yearOptions, setYearOptions] = useState([]);
-  const [allSections] = useState(['A', 'B', 'C']); // Mock sections
-  const [allSubjects, setAllSubjects] = useState([]); // Dynamic subjects based on filters
+  const [allSections] = useState(['A', 'B', 'C']);
+  const [allSubjects, setAllSubjects] = useState([]);
   const [users, setUsers] = useState([]);
 
   // Student add states
@@ -59,7 +187,7 @@ const AdminDashboard = () => {
 
   // Notification states
   const [notificationMessage, setNotificationMessage] = useState("");
-  const [notificationTarget, setNotificationTarget] = useState('student'); // 'student', 'staff', or 'both'
+  const [notificationTarget, setNotificationTarget] = useState('student');
 
   const canvasRef = useRef(null);
 
@@ -70,7 +198,7 @@ const AdminDashboard = () => {
     designation: "Administrator"
   };
 
-  // Adjusted mock today's attendance data with more students
+  // Adjusted mock today's attendance data
   const [todayAttendanceData, setTodayAttendanceData] = useState([
     { regNo: "EC001", status: true },
     { regNo: "EC002", status: true },
@@ -110,7 +238,7 @@ const AdminDashboard = () => {
     { name: 'Signals & Systems', percentage: 100 },
   ];
 
-  // Mock combined attendance data without daily
+  // Mock combined attendance data
   const combinedAttendanceData = {
     weekly: {
       labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
@@ -134,28 +262,28 @@ const AdminDashboard = () => {
 
   // Mock students data
   const [studentsData, setStudentsData] = useState([
-  {
-    regNo: "AC22UEC001",
-    name: "Student A",
-    marks: { ut1: 45, ut2: 42, ut3: 48, model1: 85, sem: 90 },
-    attendancePercentage: 95,
-    insights: ["Behavior is good", "Consistent performance", "High marks in Web Development"]
-  },
-  {
-    regNo: "AC22UEC002",
-    name: "Student B",
-    marks: { ut1: 38, ut2: 40, ut3: 42, model1: 78, sem: 83 },
-    attendancePercentage: 85,
-    insights: ["Taking continuous leave on Saturday", "Less marks in Database Systems", "Needs improvement in consistency"]
-  },
-  {
-    regNo: "AC22UEC003",
-    name: "Student C",
-    marks: { ut1: 25, ut2: 22, ut3: 20, model1: 45, sem: 49 },
-    attendancePercentage: 60,
-    insights: ["Low attendance", "Failing in multiple subjects", "Requires counseling"]
-  },
-]);
+    {
+      regNo: "AC22UEC001",
+      name: "Student A",
+      marks: { ut1: 45, ut2: 42, ut3: 48, model1: 85, sem: 90 },
+      attendancePercentage: 95,
+      insights: ["Behavior is good", "Consistent performance", "High marks in Web Development"]
+    },
+    {
+      regNo: "AC22UEC002",
+      name: "Student B",
+      marks: { ut1: 38, ut2: 40, ut3: 42, model1: 78, sem: 83 },
+      attendancePercentage: 85,
+      insights: ["Taking continuous leave on Saturday", "Less marks in Database Systems", "Needs improvement in consistency"]
+    },
+    {
+      regNo: "AC22UEC003",
+      name: "Student C",
+      marks: { ut1: 25, ut2: 22, ut3: 20, model1: 45, sem: 49 },
+      attendancePercentage: 60,
+      insights: ["Low attendance", "Failing in multiple subjects", "Requires counseling"]
+    },
+  ]);
 
   // Mock insights
   const attendanceInsights = [
@@ -189,7 +317,7 @@ const AdminDashboard = () => {
     fetchStaffList();
     setNotifications(mockNotifications);
     fetchFilteredData();
-  }, [selectedDepartment, selectedYear, selectedSection, selectedSubject, selectedStaff, filterType]);
+  }, [selectedDepartment, selectedYear, selectedSection, selectedSubject, selectedStaff, filterType, token]);
 
   useEffect(() => {
     const departmentMap = {
@@ -211,7 +339,6 @@ const AdminDashboard = () => {
 
   async function fetchFilteredData() {
     try {
-      // Example API call for filtered data
       const params = {
         department: selectedDepartment,
         year: selectedYear,
@@ -226,7 +353,6 @@ const AdminDashboard = () => {
       setAllSubjects(res.data.subjects || []);
     } catch (err) {
       console.error(err);
-      // Use mock data as fallback
       setTodayAttendanceData([
         { regNo: "EC001", status: true },
         { regNo: "EC002", status: true },
@@ -332,19 +458,16 @@ const AdminDashboard = () => {
     }
   }
 
-  // Delete notification
   const deleteNotification = (id) => {
     setNotifications(notifications.filter(notification => notification.id !== id));
   };
 
-  // Mark notification as read
   const markAsRead = (id) => {
     setNotifications(notifications.map(notification => 
       notification.id === id ? {...notification, read: true} : notification
     ));
   };
 
-  // Get unread notifications count
   const unreadCount = notifications.filter(n => !n.read).length;
 
   const drawChart = () => {
@@ -361,7 +484,7 @@ const AdminDashboard = () => {
     }
 
     canvas.width = 800;
-    canvas.height = 280;
+    canvas.height = 350;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -391,7 +514,6 @@ const AdminDashboard = () => {
       label: labels[i]
     }));
 
-    // Draw grid lines
     ctx.strokeStyle = '#4b5563';
     ctx.lineWidth = 1;
     ctx.setLineDash([5, 5]);
@@ -408,7 +530,6 @@ const AdminDashboard = () => {
     }
     ctx.setLineDash([]);
 
-    // Draw labels
     ctx.fillStyle = '#e2e8f0';
     ctx.font = 'bold 12px Inter';
     ctx.textAlign = 'center';
@@ -424,7 +545,6 @@ const AdminDashboard = () => {
       );
     }
 
-    // Draw filled area
     const gradient = ctx.createLinearGradient(0, 0, 0, height);
     gradient.addColorStop(0, 'rgba(59, 130, 246, 0.8)');
     gradient.addColorStop(1, 'rgba(59, 130, 246, 0.2)');
@@ -436,7 +556,6 @@ const AdminDashboard = () => {
     ctx.fillStyle = gradient;
     ctx.fill();
 
-    // Draw line
     ctx.beginPath();
     ctx.moveTo(points[0].x, points[0].y);
     points.forEach((point, i) => {
@@ -451,7 +570,6 @@ const AdminDashboard = () => {
     ctx.lineWidth = 2;
     ctx.stroke();
 
-    // Draw points
     points.forEach(point => {
       ctx.beginPath();
       ctx.arc(point.x, point.y, 4, 0, 2 * Math.PI);
@@ -464,7 +582,7 @@ const AdminDashboard = () => {
   };
 
   // Profile Popup Component
-  const ProfilePopup = () => (
+  const ProfilePopup = memo(() => (
     <div className={styles.profilePopupOverlay}>
       <div className={styles.profilePopup}>
         <h3>Admin Profile</h3>
@@ -480,10 +598,10 @@ const AdminDashboard = () => {
         <button className={styles.closeBtn} onClick={() => setShowProfilePopup(false)}>Close</button>
       </div>
     </div>
-  );
+  ));
 
   // Student Popup Component
-  const StudentPopup = () => {
+  const StudentPopup = memo(() => {
     if (!selectedStudent) return null;
     return (
       <div className={styles.studentPopupOverlay}>
@@ -528,19 +646,19 @@ const AdminDashboard = () => {
         </div>
       </div>
     );
-  };
+  });
 
   // Notifications Component
-  const Notifications = () => (
+  const Notifications = memo(() => (
     <div className={styles.notificationsSection}>
-      <div className={styles.notificationsHeader}>
-        <h3>Notifications</h3>
-        <span className={styles.badge}>{unreadCount}</span>
+      <div className={styles.notificationBell} onClick={() => setShowNotifications(!showNotifications)}>
+        🔔
+        {unreadCount > 0 && <span className={styles.badge}>{unreadCount}</span>}
       </div>
-      <div className={styles.notificationsList}>
+      <div className={`${styles.notificationsPopup} ${showNotifications ? styles.active : ''}`}>
         {notifications.length > 0 ? (
           notifications.map(notification => (
-            <div key={notification.id} className={`${styles.notificationItem} ${notification.read ? styles.read : styles.unread}`}>
+            <div key={notification.id} className={`${styles.notificationItem} ${notification.read ? '' : styles.unread}`}>
               <div className={styles.notificationContent}>
                 <span className={`${styles.notificationIcon} ${styles[notification.type]}`}>
                   {notification.type === 'low-attendance' ? '⚠️' : 
@@ -578,10 +696,10 @@ const AdminDashboard = () => {
         )}
       </div>
     </div>
-  );
+  ));
 
-  // Today's Attendance Component for Admin (matched to staff)
-  const TodayAttendance = () => (
+  // Today's Attendance Component
+  const TodayAttendance = memo(() => (
     <div className={styles.todayAttendance}>
       <h3>Today's Student Attendance</h3>
       <div className={styles.attendanceStats}>
@@ -593,7 +711,7 @@ const AdminDashboard = () => {
       </div>
       <div className={styles.attendanceGrid}>
         {todayAttendanceData.map((student, index) => (
-          <div key={index} className={styles.studentIcon}>
+          <div key={student.regNo} className={styles.studentIcon}>
             <div
               className={`${styles.icon} ${student.status ? (student.late ? styles.late : styles.present) : styles.absent}`}
               style={{ backgroundImage: `url(https://static.thenounproject.com/png/1594252-200.png)`, backgroundSize: 'cover' }}
@@ -605,15 +723,15 @@ const AdminDashboard = () => {
         ))}
       </div>
     </div>
-  );
+  ));
 
   // Subject Wise Percentage Component
-  const SubjectWisePercentage = () => (
+  const SubjectWisePercentage = memo(() => (
     <div className={styles.subjectPerformance}>
       <h3>Subject-wise Average Attendance</h3>
       <div className={styles.subjectsGrid}>
         {subjectStats.map((subject, index) => (
-          <div key={index} className={styles.subjectCard}>
+          <div key={subject.name} className={styles.subjectCard}>
             <div className={styles.circularProgress}>
               <div 
                 className={styles.progressCircle}
@@ -629,10 +747,10 @@ const AdminDashboard = () => {
         ))}
       </div>
     </div>
-  );
+  ));
 
-  // Combined Attendance Chart Component (matched to staff)
-  const CombinedAttendanceChart = () => {
+  // Combined Attendance Chart Component
+  const CombinedAttendanceChart = memo(() => {
     const handlePrev = () => setCurrentWeek(prev => Math.max(prev - 1, 0));
     const handleNext = () => setCurrentWeek(prev => prev + 1);
 
@@ -660,14 +778,14 @@ const AdminDashboard = () => {
           </div>
         </div>
         <div className={styles.chartContainer}>
-          <canvas ref={canvasRef} width={800} height={280} />
+          <canvas ref={canvasRef} width={800} height={350} />
         </div>
       </div>
     );
-  };
+  });
 
-  // Marks Table Component for Admin (View Only)
-  const MarksTable = () => (
+  // Marks Table Component
+  const MarksTable = memo(() => (
     <div className={styles.marksTable}>
       <h3>View Marks for {selectedSubject}</h3>
       <table>
@@ -683,8 +801,8 @@ const AdminDashboard = () => {
           </tr>
         </thead>
         <tbody>
-          {studentsData.map((student, index) => (
-            <tr key={index} className={student.marks.sem < 50 ? styles.fail : ''}>
+          {studentsData.map((student) => (
+            <tr key={student.regNo} className={student.marks.sem < 50 ? styles.fail : ''}>
               <td>{student.regNo}</td>
               <td>{student.name}</td>
               <td>{student.marks.ut1}</td>
@@ -697,10 +815,10 @@ const AdminDashboard = () => {
         </tbody>
       </table>
     </div>
-  );
+  ));
 
-  // Academic Insights (matched to staff)
-  const AcademicInsights = () => (
+  // Academic Insights Component
+  const AcademicInsights = memo(() => (
     <div className={styles.academicInsights}>
       <h3>Academic Insights</h3>
       <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
@@ -709,7 +827,6 @@ const AdminDashboard = () => {
           <ul className={styles.insightsList} style={{ listStyle: 'none', padding: 0 }}>
             {attendanceInsights.map((insight, index) => (
               <li key={index} style={{ marginBottom: '0.8rem', padding: '0.8rem', background: '#374151', borderRadius: '8px', boxShadow: '0 2px 6px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span style={{ color: '#3b82f6', fontSize: '1.2rem' }}>•</span>
                 {insight.message}
               </li>
             ))}
@@ -720,7 +837,7 @@ const AdminDashboard = () => {
           <ul className={styles.insightsList} style={{ listStyle: 'none', padding: 0 }}>
             {marksInsights.map((insight, index) => (
               <li key={index} style={{ marginBottom: '0.8rem', padding: '0.8rem', background: '#374151', borderRadius: '8px', boxShadow: '0 2px 6px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span style={{ color: '#3b82f6', fontSize: '1.2rem' }}>•</span>
+                
                 {insight.message}
               </li>
             ))}
@@ -728,10 +845,10 @@ const AdminDashboard = () => {
         </div>
       </div>
     </div>
-  );
+  ));
 
   // Students List Component
-  const StudentsList = () => (
+  const StudentsList = memo(() => (
     <div className={styles.studentInsights}>
       <h3>Students List for {selectedSubject}</h3>
       <p className={styles.smallText}>*Click on the student to see their preview and insights</p>
@@ -743,8 +860,8 @@ const AdminDashboard = () => {
           </tr>
         </thead>
         <tbody>
-          {studentsData.map((student, index) => (
-            <tr key={index} onClick={() => { setSelectedStudent(student); setShowStudentPopup(true); }} style={{ cursor: 'pointer' }}>
+          {studentsData.map((student) => (
+            <tr key={student.regNo} onClick={() => { setSelectedStudent(student); setShowStudentPopup(true); }} style={{ cursor: 'pointer' }}>
               <td>{student.regNo}</td>
               <td>{student.name}</td>
             </tr>
@@ -752,118 +869,11 @@ const AdminDashboard = () => {
         </tbody>
       </table>
     </div>
-  );
-
-  // Add Student Component with two inputs per line
-  const AddStudent = () => (
-    <div className={styles.adminSection}>
-      <h3>Add Student</h3>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-        <input className={styles.filterSelect} placeholder="Registration number" value={studentReg} onChange={e => setStudentReg(e.target.value)} />
-        <input className={styles.filterSelect} placeholder="Student name" value={studentName} onChange={e => setStudentName(e.target.value)} />
-        <input className={styles.filterSelect} placeholder="Password" type="password" value={studentPass} onChange={e => setStudentPass(e.target.value)} />
-        <select className={styles.filterSelect} value={studentDegree} onChange={e => setStudentDegree(e.target.value)}>
-          <option value="">Select Degree</option>
-          <option value="BE/BTech">BE/BTech</option>
-          <option value="ME/MTech">ME/MTech</option>
-          <option value="MCA">MCA</option>
-          <option value="MBA">MBA</option>
-        </select>
-        <select className={styles.filterSelect} value={studentYear} onChange={e => setStudentYear(e.target.value)}>
-          <option value="">Select Year</option>
-          {yearOptions.map(y => <option key={y} value={y}>{y}</option>)}
-        </select>
-        <select className={styles.filterSelect} value={studentDept} onChange={e => setStudentDept(e.target.value)}>
-          <option value="">Select Department</option>
-          {departmentOptions.map(d => <option key={d} value={d}>{d}</option>)}
-        </select>
-        <select className={styles.filterSelect} value={studentSection} onChange={e => setStudentSection(e.target.value)}>
-          <option value="">Select Section</option>
-          {allSections.map(s => <option key={s} value={s}>{s}</option>)}
-        </select>
-        <input className={styles.filterSelect} type="date" placeholder="Date of Birth" value={studentDOB} onChange={e => setStudentDOB(e.target.value)} />
-        <input className={styles.filterSelect} type="email" placeholder="Email" value={studentEmail} onChange={e => setStudentEmail(e.target.value)} />
-        <input className={styles.filterSelect} type="tel" placeholder="Phone Number" value={studentPhone} onChange={e => setStudentPhone(e.target.value)} />
-      </div>
-      <button className={styles.saveBtn} onClick={addStudent}>Add Student</button>
-    </div>
-  );
-
-  // Add Staff Component with two inputs per line
-  const AddStaff = () => (
-    <div className={styles.adminSection}>
-      <h3>Add Staff</h3>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-        <input className={styles.filterSelect} placeholder="Staff ID" value={staffId} onChange={e => setStaffId(e.target.value)} />
-        <input className={styles.filterSelect} placeholder="Staff name" value={staffName} onChange={e => setStaffName(e.target.value)} />
-        <input className={styles.filterSelect} placeholder="Password" type="password" value={staffPass} onChange={e => setStaffPass(e.target.value)} />
-        <input className={styles.filterSelect} type="email" placeholder="Email" value={staffEmail} onChange={e => setStaffEmail(e.target.value)} />
-        <input className={styles.filterSelect} type="tel" placeholder="Phone Number" value={staffPhone} onChange={e => setStaffPhone(e.target.value)} />
-        <select className={styles.filterSelect} value={staffDepartment} onChange={e => setStaffDepartment(e.target.value)}>
-          <option value="">Select Department</option>
-          {allDepartments.map(d => <option key={d} value={d}>{d}</option>)}
-        </select>
-        <select className={styles.filterSelect} value={staffDesignation} onChange={e => setStaffDesignation(e.target.value)}>
-          <option value="">Select Designation</option>
-          <option value="Assistant Professor">Assistant Professor</option>
-          <option value="Associate Professor">Associate Professor</option>
-          <option value="Professor">Professor</option>
-        </select>
-      </div>
-      <button className={styles.saveBtn} onClick={addStaff}>Add Staff</button>
-    </div>
-  );
-
-  // Assign Staff Component
-  const AssignStaff = () => (
-    <div className={styles.adminSection}>
-      <h3>Assign Staff</h3>
-      <select className={styles.filterSelect} value={assignStaffId} onChange={e => {
-        const staff = allStaffs.find(s => s.staffId === e.target.value);
-        setAssignStaffId(staff?.staffId || '');
-        setAssignStaffName(staff?.name || '');
-      }}>
-        <option value="">Select Staff</option>
-        {allStaffs.map(s => <option key={s.staffId} value={s.staffId}>{s.name} ({s.staffId})</option>)}
-      </select>
-      <select className={styles.filterSelect} value={assignDept} onChange={e => setAssignDept(e.target.value)}>
-        <option value="">Select Department</option>
-        {allDepartments.map(d => <option key={d} value={d}>{d}</option>)}
-      </select>
-      <select className={styles.filterSelect} value={assignYear} onChange={e => setAssignYear(e.target.value)}>
-        <option value="">Select Year</option>
-        {allYears.map(y => <option key={y} value={y}>{y}</option>)}
-      </select>
-      <select className={styles.filterSelect} value={assignSection} onChange={e => setAssignSection(e.target.value)}>
-        <option value="">Select Section</option>
-        {allSections.map(s => <option key={s} value={s}>{s}</option>)}
-      </select>
-      <select className={styles.filterSelect} value={assignSubject} onChange={e => setAssignSubject(e.target.value)}>
-        <option value="">Select Subject</option>
-        {allSubjects.map(sub => <option key={sub} value={sub}>{sub}</option>)}
-      </select>
-      <button className={styles.saveBtn} onClick={assignStaff}>Assign Staff</button>
-    </div>
-  );
-
-  // Send Notification Component
-  const SendNotification = () => (
-    <div className={styles.adminSection}>
-      <h3>Send Notification</h3>
-      <select className={styles.filterSelect} value={notificationTarget} onChange={e => setNotificationTarget(e.target.value)}>
-        <option value="student">To Students</option>
-        <option value="staff">To Staff</option>
-        <option value="both">To Both</option>
-      </select>
-      <textarea className={styles.filterSelect} style={{height: '100px'}} placeholder="Notification Message" value={notificationMessage} onChange={e => setNotificationMessage(e.target.value)} />
-      <button className={styles.saveBtn} onClick={sendNotification}>Send Notification</button>
-    </div>
-  );
+  ));
 
   // All Users Component
-  const AllUsers = () => (
+  const AllUsers = memo(() => (
     <div className={styles.marksTable}>
-      <h3>All Users</h3>
       <table>
         <thead>
           <tr>
@@ -895,7 +905,7 @@ const AdminDashboard = () => {
         </tbody>
       </table>
     </div>
-  );
+  ));
 
   return (
     <div className={styles.staffDashboard}>
@@ -931,13 +941,13 @@ const AdminDashboard = () => {
               className={`${styles.tabBtn} ${activeTab === 'analysis' ? styles.active : ''}`}
               onClick={() => setActiveTab('analysis')}
             >
-              <i className="fas fa-chart-pie"></i> Student Analysis
+              <i className="fas fa-chart-pie"></i> Academic Analysis
             </button>
             <button 
               className={`${styles.tabBtn} ${activeTab === 'students' ? styles.active : ''}`}
               onClick={() => setActiveTab('students')}
             >
-              <i className="fas fa-users"></i> Students List
+              <i className="fas fa-users"></i> Students Analysis
             </button>
             <button 
               className={`${styles.tabBtn} ${activeTab === 'addStudent' ? styles.active : ''}`}
@@ -970,8 +980,6 @@ const AdminDashboard = () => {
               <i className="fas fa-list"></i> All Users
             </button>
           </div>
-
-          <Notifications />
         </div>
 
         <div className={styles.content}>
@@ -1089,13 +1097,88 @@ const AdminDashboard = () => {
 
           {activeTab === 'students' && <StudentsList />}
 
-          {activeTab === 'addStudent' && <AddStudent />}
+          {activeTab === 'addStudent' && (
+            <AddStudent
+              studentReg={studentReg}
+              setStudentReg={setStudentReg}
+              studentName={studentName}
+              setStudentName={setStudentName}
+              studentPass={studentPass}
+              setStudentPass={setStudentPass}
+              studentDegree={studentDegree}
+              setStudentDegree={setStudentDegree}
+              studentYear={studentYear}
+              setStudentYear={setStudentYear}
+              studentDept={studentDept}
+              setStudentDept={setStudentDept}
+              studentSection={studentSection}
+              setStudentSection={setStudentSection}
+              studentDOB={studentDOB}
+              setStudentDOB={setStudentDOB}
+              studentEmail={studentEmail}
+              setStudentEmail={setStudentEmail}
+              studentPhone={studentPhone}
+              setStudentPhone={setStudentPhone}
+              yearOptions={yearOptions}
+              departmentOptions={departmentOptions}
+              allSections={allSections}
+              addStudent={addStudent}
+            />
+          )}
 
-          {activeTab === 'addStaff' && <AddStaff />}
+          {activeTab === 'addStaff' && (
+            <AddStaff
+              staffId={staffId}
+              setStaffId={setStaffId}
+              staffName={staffName}
+              setStaffName={setStaffName}
+              staffPass={staffPass}
+              setStaffPass={setStaffPass}
+              staffEmail={staffEmail}
+              setStaffEmail={setStaffEmail}
+              staffPhone={staffPhone}
+              setStaffPhone={setStaffPhone}
+              staffDepartment={staffDepartment}
+              setStaffDepartment={setStaffDepartment}
+              staffDesignation={staffDesignation}
+              setStaffDesignation={setStaffDesignation}
+              allDepartments={allDepartments}
+              addStaff={addStaff}
+            />
+          )}
 
-          {activeTab === 'assignStaff' && <AssignStaff />}
+          {activeTab === 'assignStaff' && (
+            <AssignStaff
+              assignStaffId={assignStaffId}
+              setAssignStaffId={setAssignStaffId}
+              assignStaffName={assignStaffName}
+              setAssignStaffName={setAssignStaffName}
+              assignDept={assignDept}
+              setAssignDept={setAssignDept}
+              assignYear={assignYear}
+              setAssignYear={setAssignYear}
+              assignSection={assignSection}
+              setAssignSection={setAssignSection}
+              assignSubject={assignSubject}
+              setAssignSubject={setAssignSubject}
+              allStaffs={allStaffs}
+              allDepartments={allDepartments}
+              allYears={allYears}
+              allSections={allSections}
+              allSubjects={allSubjects}
+              assignStaff={assignStaff}
+            />
+          )}
 
-          {activeTab === 'sendNotification' && <SendNotification />}
+          {activeTab === 'sendNotification' && (
+            <SendNotification
+              notificationTarget={notificationTarget}
+              setNotificationTarget={setNotificationTarget}
+              notificationMessage={notificationMessage}
+              setNotificationMessage={setNotificationMessage}
+              sendNotification={sendNotification}
+            />
+          )}
 
           {activeTab === 'allUsers' && <AllUsers />}
         </div>
@@ -1103,6 +1186,7 @@ const AdminDashboard = () => {
 
       {showProfilePopup && <ProfilePopup />}
       {showStudentPopup && <StudentPopup />}
+      <Notifications />
     </div>
   );
 };

@@ -1,5 +1,3 @@
-/* AdminDashboard.module.css - Matching StaffDashboard Theme */
-
 /* GLOBAL STYLES */
 body,
 html {
@@ -29,7 +27,7 @@ html {
 
 /* Sidebar Styles */
 .sidebar {
-  width: 25%;
+  width: 20%;
   background: #1e293b;
   padding: 1.5rem;
   display: flex;
@@ -123,21 +121,27 @@ html {
 
 /* Notifications Styles */
 .notificationsSection {
-  flex-grow: 1;
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 100;
 }
 
-.notificationsHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid #334155;
+.notificationBell {
+  background: #2d3748;
+  border: 1px solid #334155;
+  color: #cbd5e1;
+  padding: 0.8rem;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1.2rem;
+  position: relative;
 }
 
-.notificationsHeader h3 {
-  font-size: 1.1rem;
-  color: #bfdbfe;
+.notificationBell:hover {
+  background: #374151;
+  color: #f8fafc;
 }
 
 .badge {
@@ -147,12 +151,33 @@ html {
   padding: 0.2rem 0.6rem;
   font-size: 0.75rem;
   font-weight: bold;
+  position: absolute;
+  top: -0.3rem;
+  right: -0.3rem;
+}
+
+.notificationsPopup {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 300px;
+  background: #1e293b;
+  border-radius: 10px;
+  padding: 1rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  border: 1px solid #334155;
+  margin-top: 0.5rem;
+}
+
+.notificationsPopup.active {
+  display: block;
 }
 
 .notificationItem {
   background: #2d3748;
-  border-radius: 10px;
-  padding: 0.9rem;
+  border-radius: 8px;
+  padding: 0.8rem;
   margin-bottom: 0.7rem;
   display: flex;
   justify-content: space-between;
@@ -233,7 +258,7 @@ html {
 
 /* Content Styles */
 .content {
-  width: 75%;
+  width: 80%;
   padding: 2rem;
   background: #1e293b;
   overflow-y: auto;
@@ -247,8 +272,8 @@ html {
 
 .contentHeader {
   display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid #334155;
@@ -483,7 +508,7 @@ label {
   background: #2d3748;
   padding: 1.5rem;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
   margin-bottom: 1.5rem;
   transition: all 0.3s ease;
   border: 1px solid #334155;
@@ -491,7 +516,7 @@ label {
 }
 
 .attendanceChart:hover {
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 }
 
 .chartHeader {
@@ -507,13 +532,6 @@ label {
   margin: 0;
   font-size: 1.1rem;
   color: #f8fafc;
-}
-
-.chartContainer {
-  width: 100%;
-  max-width: 800px;
-  height: 280px;
-  margin: 0 auto;
 }
 
 .filters .filterGroup select {
@@ -544,10 +562,12 @@ canvas {
   border-radius: 8px;
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
   width: 100% !important;
-  height: 280px !important;
+  height: 350px !important;
+  max-width: 100%;
+  display: block;
 }
 
-/* Marks Table */
+/* Marks Table and All Users Table */
 .marksTable {
   background: #2d3748;
   padding: 1.2rem;
@@ -555,6 +575,7 @@ canvas {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   transition: all 0.3s ease;
   border: 1px solid #334155;
+  overflow-x: auto;
 }
 
 .marksTable:hover {
@@ -570,8 +591,8 @@ canvas {
 
 table {
   width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
+  min-width: 800px;
+  border-collapse: collapse;
   background: #374151;
   border-radius: 10px;
   overflow: hidden;
@@ -580,9 +601,9 @@ table {
 
 th,
 td {
-  padding: 0.9rem 1.1rem;
+  padding: 1rem 1.2rem;
   text-align: left;
-  border-bottom: 1px solid #4b5563;
+  border: 1px solid #4b5563;
   color: #cbd5e1;
   transition: all 0.3s ease;
 }
@@ -593,21 +614,46 @@ th {
   color: #ffffff;
 }
 
-tr:last-child td {
-  border-bottom: none;
-}
-
-tr:nth-child(even) {
-  background: #4b5563;
-}
-
 tr:hover {
   background: #6b7280;
 }
 
+.pass {
+  color: #10b981;
+  font-weight: 500;
+}
+
 .fail {
-  background: rgba(239, 68, 68, 0.2);
   color: #ef4444;
+  font-weight: 500;
+}
+
+.status {
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  text-align: center;
+  border: none;
+}
+
+.status.pass {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.status.fail {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.status.upcoming {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+}
+
+.status.finished {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
 }
 
 /* Academic Insights */
@@ -691,36 +737,64 @@ tr:hover {
 /* Admin Sections (Add Student, Add Staff, Assign Staff, Send Notification) */
 .adminSection {
   background: #2d3748;
-  padding: 1.2rem;
+  padding: 2rem;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition: all 0.3s ease;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
   border: 1px solid #334155;
+  transition: all 0.3s ease;
+  flex: 1;
+  min-width: 0;
 }
 
 .adminSection:hover {
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.adminSectionsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
 }
 
 .adminSection h3 {
-  margin-bottom: 1.2rem;
-  font-size: 1.1rem;
-  color: #f8fafc;
+  margin-bottom: 1.8rem;
+  font-size: 1.5rem;
+  color: #bfdbfe;
   text-align: center;
+  font-weight: 600;
+  border-bottom: 1px solid #334155;
+  padding-bottom: 0.8rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  margin-bottom: 1.5rem;
+}
+
+.formGroup label {
+  font-size: 0.95rem;
+  color: #cbd5e1;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .adminSection input,
 .adminSection select,
 .adminSection textarea {
   width: 100%;
-  padding: 0.5rem 1rem;
+  padding: 0.9rem;
   border-radius: 8px;
-  border: 1px solid #334155;
-  background: #2d3748;
+  border: 2px solid #4b5563; /* Updated border style */
+  background: #1e293b;
   color: #f8fafc;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   transition: all 0.3s ease;
-  margin-bottom: 1rem;
+  box-sizing: border-box;
 }
 
 .adminSection input:focus,
@@ -728,33 +802,33 @@ tr:hover {
 .adminSection textarea:focus {
   outline: none;
   border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
 
-.adminSection .filterSelect {
-  width: 100%;
-}
 
-/* Two-column layout for Add Student and Add Staff */
-.adminSection .gridContainer {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+
+.adminSection input::placeholder,
+.adminSection textarea::placeholder {
+  color: #94a3b8;
 }
 
 .saveBtn {
   background: #10b981;
   color: #ffffff;
   border: none;
-  padding: 0.7rem 1.2rem;
+  padding: 1rem 2rem;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
   width: 100%;
+  font-weight: 600;
+  font-size: 1rem;
+  text-transform: uppercase;
 }
 
 .saveBtn:hover {
   background: #059669;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
 }
 
 /* Profile Popup */
@@ -950,12 +1024,18 @@ tr:hover {
     width: 100%;
   }
   
-  .attendanceGrid {
-    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+  .adminSectionsContainer {
+    flex-direction: column;
   }
   
-  .adminSection .gridContainer {
-    grid-template-columns: 1fr;
+  .adminSection {
+    max-width: 100%;
+    margin-bottom: 1.5rem;
+  }
+  
+  .notificationsSection {
+    top: 1rem;
+    right: 1rem;
   }
 }
 
@@ -984,8 +1064,7 @@ tr:hover {
     font-size: 0.85rem;
   }
   
-  th,
-  td {
+  th, td {
     padding: 0.7rem;
   }
   
@@ -993,11 +1072,28 @@ tr:hover {
     grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
   }
   
-  .chartContainer {
-    height: 200px;
+  .adminSection {
+    padding: 1.5rem;
   }
   
-  canvas {
-    height: 200px !important;
+  .adminSection h3 {
+    font-size: 1.3rem;
+  }
+  
+  .formGroup {
+    gap: 1rem;
+  }
+  
+  .saveBtn {
+    padding: 0.8rem 1.5rem;
+  }
+  
+  .notificationsSection {
+    top: 0.5rem;
+    right: 0.5rem;
+  }
+  
+  .notificationsPopup {
+    width: 250px;
   }
 }
