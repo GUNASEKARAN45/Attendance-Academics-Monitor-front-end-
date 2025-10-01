@@ -526,54 +526,73 @@ const AdminDashboard = () => {
   }
 
   async function addStudent() {
-    if (!studentReg || !studentName || !studentPass || !studentDegree || !studentYear || !studentDept || !studentSection || !studentDOB || !studentEmail || !studentPhone) {
-      return alert("Please fill all student fields");
-    }
-    try {
-      await api.post("/api/admin/add-student", {
-        studentReg, name: studentName, password: studentPass,
-        degree: studentDegree, year: studentYear, department: studentDept, section: studentSection,
-        dob: studentDOB, email: studentEmail, phone: studentPhone
-      });
-      alert("Student added");
-      setStudentReg(""); setStudentName(""); setStudentPass("");
-      setStudentDegree(""); setStudentYear(""); setStudentDept(""); setStudentSection("");
-      setStudentDOB(""); setStudentEmail(""); setStudentPhone("");
-      fetchUsers();
-    } catch (err) {
-      alert(err?.response?.data?.error || "Failed");
-    }
+  if (!studentReg || !studentName || !studentPass || !studentDegree || !studentYear || !studentDept || !studentSection || !studentDOB || !studentEmail || !studentPhone) {
+    return alert("Please fill all student fields");
   }
+  try {
+    await api.post("/api/admin/add-student", {
+      studentReg,
+      name: studentName,
+      password: studentPass,
+      degree: studentDegree,
+      year: studentYear,
+      department: studentDept,
+      section: studentSection,
+      dob: studentDOB,
+      email: studentEmail,
+      phone: studentPhone
+    });
+    alert("Student added");
+    setStudentReg(""); setStudentName(""); setStudentPass("");
+    setStudentDegree(""); setStudentYear(""); setStudentDept(""); setStudentSection("");
+    setStudentDOB(""); setStudentEmail(""); setStudentPhone("");
+    fetchUsers();
+  } catch (err) {
+    alert(err?.response?.data?.error || "Failed");
+  }
+}
 
-  async function addStaff() {
-    if (!staffId || !staffName || !staffPass || !staffEmail || !staffPhone || !staffDepartment || !staffDesignation) return alert("Please fill all staff fields");
-    try {
-      await api.post("/api/admin/add-staff", { staffId, name: staffName, password: staffPass, email: staffEmail, phone: staffPhone, department: staffDepartment, designation: staffDesignation });
-      alert("Staff added");
-      setStaffId(""); setStaffName(""); setStaffPass(""); setStaffEmail(""); setStaffPhone(""); setStaffDepartment(""); setStaffDesignation("");
-      fetchUsers(); fetchStaffList();
-    } catch (err) {
-      alert(err?.response?.data?.error || "Failed");
-    }
+async function addStaff() {
+  if (!staffId || !staffName || !staffPass || !staffEmail || !staffPhone || !staffDepartment || !staffDesignation) {
+    return alert("Please fill all staff fields");
   }
+  try {
+    await api.post("/api/admin/add-staff", {
+      staffId,
+      name: staffName,
+      password: staffPass,
+      email: staffEmail,
+      phone: staffPhone,
+      department: staffDepartment,
+      designation: staffDesignation
+    });
+    alert("Staff added");
+    setStaffId(""); setStaffName(""); setStaffPass(""); setStaffEmail(""); setStaffPhone(""); setStaffDepartment(""); setStaffDesignation("");
+    fetchUsers(); fetchStaffList();
+  } catch (err) {
+    alert(err?.response?.data?.error || "Failed");
+  }
+}
 
-  async function assignStaff() {
-    if (!assignStaffId || !assignDept || !assignYear || !assignSection || !assignSubject) return alert("Please fill all fields");
-    try {
-      await api.post("/api/admin/assign-staff", {
-        staffId: assignStaffId,
-        staffName: assignStaffName,
-        department: assignDept,
-        year: assignYear,
-        section: assignSection,
-        subject: assignSubject
-      });
-      alert("Staff assigned successfully");
-      setAssignStaffId(""); setAssignStaffName(""); setAssignDept(""); setAssignYear(""); setAssignSection(""); setAssignSubject("");
-    } catch (err) {
-      alert(err?.response?.data?.error || "Failed");
-    }
+async function assignStaff() {
+  if (!assignStaffId || !assignDept || !assignYear || !assignSection || !assignSubject) {
+    return alert("Please fill all fields");
   }
+  try {
+    await api.post("/api/admin/assign-staff", {
+      staffId: assignStaffId,
+      staffName: assignStaffName,
+      department: assignDept,
+      year: assignYear,
+      section: assignSection,
+      subject: assignSubject
+    });
+    alert("Staff assigned successfully");
+    setAssignStaffId(""); setAssignStaffName(""); setAssignDept(""); setAssignYear(""); setAssignSection(""); setAssignSubject("");
+  } catch (err) {
+    alert(err?.response?.data?.error || "Failed");
+  }
+}
 
   async function sendNotification() {
     if (!notificationMessage) return alert("Please enter a message");

@@ -571,7 +571,6 @@ const StaffDashboard = () => {
           <ul className={styles.insightsList} style={{ listStyle: 'none', padding: 0 }}>
             {attendanceInsights.map((insight, index) => (
               <li key={index} style={{ marginBottom: '0.8rem', padding: '0.8rem', background: '#374151', borderRadius: '8px', boxShadow: '0 2px 6px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span style={{ color: '#3b82f6', fontSize: '1.2rem' }}>•</span>
                 {insight.message}
               </li>
             ))}
@@ -582,7 +581,6 @@ const StaffDashboard = () => {
           <ul className={styles.insightsList} style={{ listStyle: 'none', padding: 0 }}>
             {marksInsights.map((insight, index) => (
               <li key={index} style={{ marginBottom: '0.8rem', padding: '0.8rem', background: '#374151', borderRadius: '8px', boxShadow: '0 2px 6px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span style={{ color: '#3b82f6', fontSize: '1.2rem' }}>•</span>
                 {insight.message}
               </li>
             ))}
