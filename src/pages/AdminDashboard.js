@@ -3,131 +3,259 @@ import styles from '../styles/AdminDashboard.module.css';
 import { api, setAuthToken } from "../Api";
 
 // Memoized child components to prevent unnecessary re-renders
-const AddStudent = memo(({ studentReg, setStudentReg, studentName, setStudentName, studentPass, setStudentPass, studentDegree, setStudentDegree, studentYear, setStudentYear, studentDept, setStudentDept, studentSection, setStudentSection, studentDOB, setStudentDOB, studentEmail, setStudentEmail, studentPhone, setStudentPhone, yearOptions, departmentOptions, allSections, addStudent }) => (
+const AddStudent = memo(({ 
+  studentReg, setStudentReg, 
+  studentName, setStudentName, 
+  studentPass, setStudentPass, 
+  studentDegree, setStudentDegree, 
+  studentYear, setStudentYear, 
+  studentDept, setStudentDept, 
+  studentSection, setStudentSection, 
+  studentDOB, setStudentDOB, 
+  studentEmail, setStudentEmail, 
+  studentPhone, setStudentPhone, 
+  yearOptions, departmentOptions, 
+  allSections, addStudent 
+}) => (
   <div className={styles.adminSection}>
     <div className={styles.formGroup}>
-      <label>Registration Number</label>
-      <input className={styles.filterSelect} placeholder="Registration number" value={studentReg} onChange={e => setStudentReg(e.target.value)} required />
-      <label>Student Name</label>
-      <input className={styles.filterSelect} placeholder="Student name" value={studentName} onChange={e => setStudentName(e.target.value)} required />
-      <label>Password</label>
-      <input className={styles.filterSelect} type="password" placeholder="Password" value={studentPass} onChange={e => setStudentPass(e.target.value)} required />
-      <label>Degree</label>
-      <select className={styles.filterSelect} value={studentDegree} onChange={e => setStudentDegree(e.target.value)} required>
-        <option value="">Select Degree</option>
-        <option value="BE/BTech">BE/BTech</option>
-        <option value="ME/MTech">ME/MTech</option>
-        <option value="MCA">MCA</option>
-        <option value="MBA">MBA</option>
-      </select>
-      <label>Year</label>
-      <select className={styles.filterSelect} value={studentYear} onChange={e => setStudentYear(e.target.value)} required>
-        <option value="">Select Year</option>
-        {yearOptions.map(y => <option key={y} value={y}>{y}</option>)}
-      </select>
-      <label>Department</label>
-      <select className={styles.filterSelect} value={studentDept} onChange={e => setStudentDept(e.target.value)} required>
-        <option value="">Select Department</option>
-        {departmentOptions.map(d => <option key={d} value={d}>{d}</option>)}
-      </select>
-      <label>Section</label>
-      <select className={styles.filterSelect} value={studentSection} onChange={e => setStudentSection(e.target.value)} required>
-        <option value="">Select Section</option>
-        {allSections.map(s => <option key={s} value={s}>{s}</option>)}
-      </select>
-      <label>Date of Birth</label>
-      <input className={styles.filterSelect} type="date" value={studentDOB} onChange={e => setStudentDOB(e.target.value)} required />
-      <label>Email</label>
-      <input className={styles.filterSelect} type="email" placeholder="Email" value={studentEmail} onChange={e => setStudentEmail(e.target.value)} required />
-      <label>Phone Number</label>
-      <input className={styles.filterSelect} type="tel" placeholder="Phone Number" value={studentPhone} onChange={e => setStudentPhone(e.target.value)} required />
+      {/* Row 1: Registration Number and Student Name */}
+      <div>
+        <label>Registration Number</label>
+        <input className={styles.filterSelect} placeholder="Registration number" value={studentReg} onChange={e => setStudentReg(e.target.value)} required />
+      </div>
+      <div>
+        <label>Student Name</label>
+        <input className={styles.filterSelect} placeholder="Student name" value={studentName} onChange={e => setStudentName(e.target.value)} required />
+      </div>
+
+      {/* Row 2: Password and Degree */}
+      <div>
+        <label>Password</label>
+        <input className={styles.filterSelect} type="password" placeholder="Password" value={studentPass} onChange={e => setStudentPass(e.target.value)} required />
+      </div>
+      <div>
+        <label>Degree</label>
+        <select className={styles.filterSelect} value={studentDegree} onChange={e => setStudentDegree(e.target.value)} required>
+          <option value="">Select Degree</option>
+          <option value="BE/BTech">BE/BTech</option>
+          <option value="ME/MTech">ME/MTech</option>
+          <option value="MCA">MCA</option>
+          <option value="MBA">MBA</option>
+        </select>
+      </div>
+
+      {/* Row 3: Year and Department */}
+      <div>
+        <label>Year</label>
+        <select className={styles.filterSelect} value={studentYear} onChange={e => setStudentYear(e.target.value)} required>
+          <option value="">Select Year</option>
+          {yearOptions.map(y => <option key={y} value={y}>{y}</option>)}
+        </select>
+      </div>
+      <div>
+        <label>Department</label>
+        <select className={styles.filterSelect} value={studentDept} onChange={e => setStudentDept(e.target.value)} required>
+          <option value="">Select Department</option>
+          {departmentOptions.map(d => <option key={d} value={d}>{d}</option>)}
+        </select>
+      </div>
+
+      {/* Row 4: Section and Date of Birth */}
+      <div>
+        <label>Section</label>
+        <select className={styles.filterSelect} value={studentSection} onChange={e => setStudentSection(e.target.value)} required>
+          <option value="">Select Section</option>
+          {allSections.map(s => <option key={s} value={s}>{s}</option>)}
+        </select>
+      </div>
+      <div>
+        <label>Date of Birth</label>
+        <input className={styles.filterSelect} type="date" value={studentDOB} onChange={e => setStudentDOB(e.target.value)} required />
+      </div>
+
+      {/* Row 5: Email and Phone Number */}
+      <div>
+        <label>Email</label>
+        <input className={styles.filterSelect} type="email" placeholder="Email" value={studentEmail} onChange={e => setStudentEmail(e.target.value)} required />
+      </div>
+      <div>
+        <label>Phone Number</label>
+        <input className={styles.filterSelect} type="tel" placeholder="Phone Number" value={studentPhone} onChange={e => setStudentPhone(e.target.value)} required />
+      </div>
+
+      {/* Button spans both columns */}
       <button className={styles.saveBtn} onClick={addStudent}>Add Student</button>
     </div>
   </div>
 ));
 
-const AddStaff = memo(({ staffId, setStaffId, staffName, setStaffName, staffPass, setStaffPass, staffEmail, setStaffEmail, staffPhone, setStaffPhone, staffDepartment, setStaffDepartment, staffDesignation, setStaffDesignation, allDepartments, addStaff }) => (
+const AddStaff = memo(({ 
+  staffId, setStaffId, 
+  staffName, setStaffName, 
+  staffPass, setStaffPass, 
+  staffEmail, setStaffEmail, 
+  staffPhone, setStaffPhone, 
+  staffDepartment, setStaffDepartment, 
+  staffDesignation, setStaffDesignation, 
+  allDepartments, addStaff 
+}) => (
   <div className={styles.adminSection}>
     <div className={styles.formGroup}>
-      <label>Staff ID</label>
-      <input className={styles.filterSelect} placeholder="Staff ID" value={staffId} onChange={e => setStaffId(e.target.value)} required />
-      <label>Staff Name</label>
-      <input className={styles.filterSelect} placeholder="Staff name" value={staffName} onChange={e => setStaffName(e.target.value)} required />
-      <label>Password</label>
-      <input className={styles.filterSelect} type="password" placeholder="Password" value={staffPass} onChange={e => setStaffPass(e.target.value)} required />
-      <label>Email</label>
-      <input className={styles.filterSelect} type="email" placeholder="Email" value={staffEmail} onChange={e => setStaffEmail(e.target.value)} required />
-      <label>Phone Number</label>
-      <input className={styles.filterSelect} type="tel" placeholder="Phone Number" value={staffPhone} onChange={e => setStaffPhone(e.target.value)} required />
-      <label>Department</label>
-      <select className={styles.filterSelect} value={staffDepartment} onChange={e => setStaffDepartment(e.target.value)} required>
-        <option value="">Select Department</option>
-        {allDepartments.map(d => <option key={d} value={d}>{d}</option>)}
-      </select>
-      <label>Designation</label>
-      <select className={styles.filterSelect} value={staffDesignation} onChange={e => setStaffDesignation(e.target.value)} required>
-        <option value="">Select Designation</option>
-        <option value="Assistant Professor">Assistant Professor</option>
-        <option value="Associate Professor">Associate Professor</option>
-        <option value="Professor">Professor</option>
-      </select>
+      {/* Row 1: Staff ID and Staff Name */}
+      <div>
+        <label>Staff ID</label>
+        <input className={styles.filterSelect} placeholder="Staff ID" value={staffId} onChange={e => setStaffId(e.target.value)} required />
+      </div>
+      <div>
+        <label>Staff Name</label>
+        <input className={styles.filterSelect} placeholder="Staff name" value={staffName} onChange={e => setStaffName(e.target.value)} required />
+      </div>
+
+      {/* Row 2: Password and Email */}
+      <div>
+        <label>Password</label>
+        <input className={styles.filterSelect} type="password" placeholder="Password" value={staffPass} onChange={e => setStaffPass(e.target.value)} required />
+      </div>
+      <div>
+        <label>Email</label>
+        <input className={styles.filterSelect} type="email" placeholder="Email" value={staffEmail} onChange={e => setStaffEmail(e.target.value)} required />
+      </div>
+
+      {/* Row 3: Phone Number and Department */}
+      <div>
+        <label>Phone Number</label>
+        <input className={styles.filterSelect} type="tel" placeholder="Phone Number" value={staffPhone} onChange={e => setStaffPhone(e.target.value)} required />
+      </div>
+      <div>
+        <label>Department</label>
+        <select className={styles.filterSelect} value={staffDepartment} onChange={e => setStaffDepartment(e.target.value)} required>
+          <option value="">Select Department</option>
+          {allDepartments.map(d => <option key={d} value={d}>{d}</option>)}
+        </select>
+      </div>
+
+      {/* Row 4: Designation */}
+      <div>
+        <label>Designation</label>
+        <select className={styles.filterSelect} value={staffDesignation} onChange={e => setStaffDesignation(e.target.value)} required>
+          <option value="">Select Designation</option>
+          <option value="Assistant Professor">Assistant Professor</option>
+          <option value="Associate Professor">Associate Professor</option>
+          <option value="Professor">Professor</option>
+        </select>
+      </div>
+      <div></div> {/* Empty div to balance the grid */}
+
+      {/* Button spans both columns */}
       <button className={styles.saveBtn} onClick={addStaff}>Add Staff</button>
     </div>
   </div>
 ));
 
-const AssignStaff = memo(({ assignStaffId, setAssignStaffId, assignStaffName, setAssignStaffName, assignDept, setAssignDept, assignYear, setAssignYear, assignSection, setAssignSection, assignSubject, setAssignSubject, allStaffs, allDepartments, allYears, allSections, allSubjects, assignStaff }) => (
+const AssignStaff = memo(({ 
+  assignStaffId, setAssignStaffId, 
+  assignStaffName, setAssignStaffName, 
+  assignDept, setAssignDept, 
+  assignYear, setAssignYear, 
+  assignSection, setAssignSection, 
+  assignSubject, setAssignSubject, 
+  allStaffs, allDepartments, allYears, allSections, allSubjects, assignStaff 
+}) => (
   <div className={styles.adminSection}>
     <div className={styles.formGroup}>
-      <label>Staff</label>
-      <select className={styles.filterSelect} value={assignStaffId} onChange={e => {
-        const staff = allStaffs.find(s => s.staffId === e.target.value);
-        setAssignStaffId(staff?.staffId || '');
-        setAssignStaffName(staff?.name || '');
-      }} required>
-        <option value="">Select Staff</option>
-        {allStaffs.map(s => <option key={s.staffId} value={s.staffId}>{s.name} ({s.staffId})</option>)}
-      </select>
-      <label>Department</label>
-      <select className={styles.filterSelect} value={assignDept} onChange={e => setAssignDept(e.target.value)} required>
-        <option value="">Select Department</option>
-        {allDepartments.map(d => <option key={d} value={d}>{d}</option>)}
-      </select>
-      <label>Year</label>
-      <select className={styles.filterSelect} value={assignYear} onChange={e => setAssignYear(e.target.value)} required>
-        <option value="">Select Year</option>
-        {allYears.map(y => <option key={y} value={y}>{y}</option>)}
-      </select>
-      <label>Section</label>
-      <select className={styles.filterSelect} value={assignSection} onChange={e => setAssignSection(e.target.value)} required>
-        <option value="">Select Section</option>
-        {allSections.map(s => <option key={s} value={s}>{s}</option>)}
-      </select>
-      <label>Subject</label>
-      <select className={styles.filterSelect} value={assignSubject} onChange={e => setAssignSubject(e.target.value)} required>
-        <option value="">Select Subject</option>
-        {allSubjects.map(sub => <option key={sub} value={sub}>{sub}</option>)}
-      </select>
+      {/* Row 1: Staff */}
+      <div>
+        <label>Staff</label>
+        <select className={styles.filterSelect} value={assignStaffId} onChange={e => {
+          const staff = allStaffs.find(s => s.staffId === e.target.value);
+          setAssignStaffId(staff?.staffId || '');
+          setAssignStaffName(staff?.name || '');
+        }} required>
+          <option value="">Select Staff</option>
+          {allStaffs.map(s => <option key={s.staffId} value={s.staffId}>{s.name} ({s.staffId})</option>)}
+        </select>
+      </div>
+      <div>
+        <label>Department</label>
+        <select className={styles.filterSelect} value={assignDept} onChange={e => setAssignDept(e.target.value)} required>
+          <option value="">Select Department</option>
+          {allDepartments.map(d => <option key={d} value={d}>{d}</option>)}
+        </select>
+      </div>
+
+      {/* Row 2: Year and Section */}
+      <div>
+        <label>Year</label>
+        <select className={styles.filterSelect} value={assignYear} onChange={e => setAssignYear(e.target.value)} required>
+          <option value="">Select Year</option>
+          {allYears.map(y => <option key={y} value={y}>{y}</option>)}
+        </select>
+      </div>
+      <div>
+        <label>Section</label>
+        <select className={styles.filterSelect} value={assignSection} onChange={e => setAssignSection(e.target.value)} required>
+          <option value="">Select Section</option>
+          {allSections.map(s => <option key={s} value={s}>{s}</option>)}
+        </select>
+      </div>
+
+      {/* Row 3: Subject */}
+      <div>
+        <label>Subject</label>
+        <select className={styles.filterSelect} value={assignSubject} onChange={e => setAssignSubject(e.target.value)} required>
+          <option value="">Select Subject</option>
+          {allSubjects.map(sub => <option key={sub} value={sub}>{sub}</option>)}
+        </select>
+      </div>
+      <div></div> {/* Empty div to balance the grid */}
+
+      {/* Button spans both columns */}
       <button className={styles.saveBtn} onClick={assignStaff}>Assign Staff</button>
     </div>
   </div>
 ));
-
-const SendNotification = memo(({ notificationTarget, setNotificationTarget, notificationMessage, setNotificationMessage, sendNotification }) => (
+const SendNotification = memo(({ 
+  notificationTarget, setNotificationTarget, 
+  notificationMessage, setNotificationMessage, 
+  sendNotification 
+}) => (
   <div className={styles.adminSection}>
-    <div className={styles.formGroup}>
-      <label>Target</label>
-      <select className={styles.filterSelect} value={notificationTarget} onChange={e => setNotificationTarget(e.target.value)} required>
-        <option value="student">To Students</option>
-        <option value="staff">To Staff</option>
-        <option value="both">To Both</option>
-      </select>
-      <label>Message</label>
-      <textarea className={styles.filterSelect} style={{ height: '120px' }} placeholder="Notification Message" value={notificationMessage} onChange={e => setNotificationMessage(e.target.value)} required />
+    <div className={styles.formGroup} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+      {/* Field 1: Target */}
+      <div>
+        <label>Target</label>
+        <select 
+          className={styles.filterSelect} 
+          value={notificationTarget} 
+          onChange={e => setNotificationTarget(e.target.value)} 
+          required
+        >
+          <option value="student">To Students</option>
+          <option value="staff">To Staff</option>
+          <option value="both">To Both</option>
+        </select>
+      </div>
+
+      {/* Field 2: Message */}
+      <div>
+        <label>Message</label>
+        <textarea 
+          className={styles.filterSelect} 
+          style={{ height: '120px' }} 
+          placeholder="Notification Message" 
+          value={notificationMessage} 
+          onChange={e => setNotificationMessage(e.target.value)} 
+          required
+        />
+      </div>
+
+      {/* Button */}
       <button className={styles.saveBtn} onClick={sendNotification}>Send Notification</button>
     </div>
   </div>
 ));
+
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('attendance');
