@@ -2,32 +2,25 @@ import React, { useState } from "react";
 import { api, setAuthToken } from "../Api";
 import { useNavigate } from "react-router-dom";
 import CaptchaBox from "../components/CaptchaBox";
-import styles from "../styles/AdminLogIn.module.css";
+import styles from "../styles/AdminLogIn.module.css"
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
 export default function AdminLogin() {
   const [adminId, setAdminId] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false); // 👈 toggle state
   const [captchaData, setCaptchaData] = useState({ captchaId: "", captchaInput: "" });
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async () => {
     if (!adminId || !password || !captchaData.captchaInput) {
       alert("Please fill all fields");
-      console.log("Missing fields:", { adminId, password, captchaInput: captchaData.captchaInput });
       return;
     }
 
     setIsLoading(true);
     try {
-      console.log("Sending login request with payload:", {
-        role: "admin",
-        identifier: adminId,
-        password,
-        captchaId: captchaData.captchaId,
-        captchaInput: captchaData.captchaInput,
-      });
       const res = await api.post("/api/auth/login", {
         role: "admin",
         identifier: adminId,
@@ -35,7 +28,7 @@ export default function AdminLogin() {
         captchaId: captchaData.captchaId,
         captchaInput: captchaData.captchaInput,
       });
-      console.log("Login response:", res.data);
+
       setAuthToken(res.data.token);
       localStorage.setItem("token", res.data.token);
       navigate("/admin_dashboard");
@@ -44,7 +37,6 @@ export default function AdminLogin() {
         err?.response?.data?.error ||
         "Login failed. Please check your credentials or try again later.";
       alert(errorMessage);
-      console.error("Login error:", err?.response?.data || err);
     } finally {
       setIsLoading(false);
     }
@@ -67,49 +59,50 @@ export default function AdminLogin() {
           <p className={styles.loginSubtitle}>Access the administration dashboard</p>
         </div>
 
+        {/* Admin Username */}
         <div className={styles.formGroup}>
           <label className={styles.formLabel}>Admin Username</label>
           <input
             className={styles.formInput}
             placeholder="Enter your username"
             value={adminId}
-            onChange={(e) => setAdminId(e.target.value)}
+            onChange={(e) => setAdminId(e.target.value.trim())}
             onKeyPress={handleKeyPress}
             disabled={isLoading}
           />
         </div>
 
+        {/* Password */}
         <div className={styles.formGroup}>
           <label className={styles.formLabel}>Password</label>
           <div className={styles.passwordWrapper}>
             <input
               className={styles.formInput}
               placeholder="Enter your password"
-              type={showPassword ? "text" : "password"} // 👈 toggle between text & password
+              type={showPassword ? "text" : "password"}
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => setPassword(e.target.value.trim())}
               onKeyPress={handleKeyPress}
               disabled={isLoading}
             />
             <button
               type="button"
-              className={styles.togglePasswordBtn}
+              className={styles.passwordToggle}
               onClick={() => setShowPassword(!showPassword)}
               disabled={isLoading}
             >
-              {showPassword ? "Hide" : "Show"}
+              {showPassword ? <AiOutlineEyeInvisible size={20} /> : <AiOutlineEye size={20} />}
             </button>
           </div>
         </div>
 
+        {/* Captcha */}
         <div className={styles.captchaContainer}>
           <div className={styles.captchaTitle}>Security Verification</div>
-          <CaptchaBox
-            onChange={(data) => setCaptchaData(data)}
-            disabled={isLoading}
-          />
+          <CaptchaBox onChange={(data) => setCaptchaData(data)} disabled={isLoading} />
         </div>
 
+        {/* Login Button */}
         <button
           className={`${styles.loginButton} ${isLoading ? styles.buttonLoading : ""}`}
           onClick={handleLogin}
@@ -118,6 +111,7 @@ export default function AdminLogin() {
           {isLoading ? "" : "Login to Dashboard"}
         </button>
 
+        {/* Footer */}
         <div className={styles.loginFooter}>
           <p className={styles.footerText}>
             Adhiyamaan College of Engineering • Administrative Access Only
