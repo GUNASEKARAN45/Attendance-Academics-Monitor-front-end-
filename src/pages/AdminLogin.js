@@ -7,6 +7,7 @@ import styles from "../styles/AdminLogIn.module.css";
 export default function AdminLogin() {
   const [adminId, setAdminId] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false); // 👈 toggle state
   const [captchaData, setCaptchaData] = useState({ captchaId: "", captchaInput: "" });
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -39,7 +40,9 @@ export default function AdminLogin() {
       localStorage.setItem("token", res.data.token);
       navigate("/admin_dashboard");
     } catch (err) {
-      const errorMessage = err?.response?.data?.error || "Login failed. Please check your credentials or try again later.";
+      const errorMessage =
+        err?.response?.data?.error ||
+        "Login failed. Please check your credentials or try again later.";
       alert(errorMessage);
       console.error("Login error:", err?.response?.data || err);
     } finally {
@@ -78,15 +81,25 @@ export default function AdminLogin() {
 
         <div className={styles.formGroup}>
           <label className={styles.formLabel}>Password</label>
-          <input
-            className={styles.formInput}
-            placeholder="Enter your password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            onKeyPress={handleKeyPress}
-            disabled={isLoading}
-          />
+          <div className={styles.passwordWrapper}>
+            <input
+              className={styles.formInput}
+              placeholder="Enter your password"
+              type={showPassword ? "text" : "password"} // 👈 toggle between text & password
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              onKeyPress={handleKeyPress}
+              disabled={isLoading}
+            />
+            <button
+              type="button"
+              className={styles.togglePasswordBtn}
+              onClick={() => setShowPassword(!showPassword)}
+              disabled={isLoading}
+            >
+              {showPassword ? "Hide" : "Show"}
+            </button>
+          </div>
         </div>
 
         <div className={styles.captchaContainer}>
