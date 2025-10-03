@@ -621,7 +621,7 @@ const StaffDashboard = () => {
     const [inputToken, setInputToken] = useState('');
     const [pairing, setPairing] = useState(false);
     const [qrCode, setQrCode] = useState('');
-    const [cameras] = useState(['Camera1 (MAC: 00:14:22:01:23:45) [ECE-A]', 'Camera2 (MAC: 00:14:22:01:23:46) [ECE-B]']);
+    const [cameras] = useState(['Camera1 (MAC: 00:14:22:01:23:45) [ECE-A]', 'Camera2 (MAC: 00:14:22:01:23:46) [ECE-B]',, 'Camera3 (MAC: 00:14:22:01:23:47) [CN LAB]']);
     const [endTimeOptions, setEndTimeOptions] = useState([]);
 
     const periodStartTimes = {
