@@ -102,6 +102,9 @@ const StudentDashboard = () => {
     { id: 4, subject: 'Software Engineering', date: '2025-09-20', type: 'UT', status: 'finished' },
     { id: 5, subject: 'Internet of Things', date: '2025-10-15', type: 'Semester', status: 'upcoming' }
   ];
+useEffect(() => {
+          document.title = "Attenitix - Student Dashboard";
+        }, []);
 
   // Initialize notifications
   useEffect(() => {

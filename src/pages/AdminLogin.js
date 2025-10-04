@@ -1,8 +1,11 @@
-import React, { useState } from "react";
+// import React, { useState } from "react";
+import React, { useState, useEffect, useRef, memo } from 'react';
+
 import { api, setAuthToken } from "../Api";
 import { useNavigate } from "react-router-dom";
 import CaptchaBox from "../components/CaptchaBox";
-import styles from "../styles/AdminLogIn.module.css"
+import styles from "../styles/AdminLogIn.module.css";
+
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
 export default function AdminLogin() {
@@ -47,6 +50,11 @@ export default function AdminLogin() {
       handleLogin();
     }
   };
+
+  useEffect(() => {
+        document.title = "Attenitix - Admin Login";
+      }, []);
+
 
   return (
     <div className={styles.adminLoginContainer}>

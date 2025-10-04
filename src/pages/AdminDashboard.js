@@ -446,6 +446,10 @@ const liveCount = presentCount + lateCount; // Total present students (on-time +
     { id: 5, type: 'update', message: 'Update marks for Operating Systems', date: '2023-10-19', read: true }
   ];
 
+   useEffect(() => {
+      document.title = "Attenitix - Admin Dashboard";
+    }, []);
+
   useEffect(() => {
     if (token) setAuthToken(token);
     fetchUsers();

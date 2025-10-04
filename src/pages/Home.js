@@ -6,6 +6,10 @@ export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
 
+ useEffect(() => {
+    document.title = "Attenitix - Home Page";
+  }, []);
+
   useEffect(() => {
     setIsVisible(true);
     const interval = setInterval(() => {

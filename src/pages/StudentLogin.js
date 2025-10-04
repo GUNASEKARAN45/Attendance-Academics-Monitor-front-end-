@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+// import React, { useState } from "react";
+import React, { useState, useEffect, useRef, memo } from 'react';
+
 import { api, setAuthToken } from "../Api";
 import { useNavigate } from "react-router-dom";
 import CaptchaBox from "../components/CaptchaBox";
@@ -47,6 +49,11 @@ export default function StudentLogin() {
       handleLogin();
     }
   };
+
+  useEffect(() => {
+            document.title = "Attenitix - Student Login";
+          }, []);
+  
 
   return (
     <div className={styles.studentLoginContainer}>

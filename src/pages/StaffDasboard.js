@@ -157,6 +157,10 @@ const liveCount = presentCount + lateCount; // Total present students (on-time +
   ];
 
   useEffect(() => {
+          document.title = "Attenitix - Staff Dashboard";
+        }, []);
+
+  useEffect(() => {
     setNotifications(mockNotifications);
   }, []);
 
