@@ -60,10 +60,19 @@ const StaffDashboard = () => {
   ]);
 
   // Calculate attendance stats
-  const totalStudents = todayAttendanceData.length;
-  const presentCount = todayAttendanceData.filter(s => s.status).length;
-  const lateCount = todayAttendanceData.filter(s => s.late && s.status).length;
-  const absentCount = totalStudents - presentCount;
+  // const totalStudents = todayAttendanceData.length;
+  // const presentCount = todayAttendanceData.filter(s => s.status ).length;
+  // const lateCount = todayAttendanceData.filter(s => s.late && s.status).length;
+  // const absentCount = totalStudents - presentCount;
+  // const liveCount = presentCount + lateCount;
+
+  // Calculate attendance stats
+const totalStudents = todayAttendanceData.length; // Total number of students
+const presentCount = todayAttendanceData.filter(s => s.status && !s.late).length; // Only on-time present students (green)
+const lateCount = todayAttendanceData.filter(s => s.late && s.status).length; // Latecomers (orange)
+const absentCount = todayAttendanceData.filter(s => !s.status ).length; // Absent students (red)
+const liveCount = presentCount + lateCount; // Total present students (on-time + late)
+
 
   // Mock subject-wise percentage
   const subjectStats = [
@@ -428,7 +437,7 @@ const StaffDashboard = () => {
       <div className={styles.attendanceStats}>
         <p>Total Students: {totalStudents}</p>
         <p>Present: {presentCount}</p>
-        <p>Live Headcount: {presentCount}</p>
+        <p>Live Headcount: {liveCount}</p>
         <p>Latecomers: {lateCount}</p>
         <p>Absent: {absentCount}</p>
       </div>

@@ -351,11 +351,18 @@ const AdminDashboard = () => {
   ]);
 
   // Calculate attendance stats
-  const totalStudents = todayAttendanceData.length;
-  const presentCount = todayAttendanceData.filter(s => s.status).length;
-  const lateCount = todayAttendanceData.filter(s => s.late && s.status).length;
-  const absentCount = totalStudents - presentCount;
-  const livecount = presentCount + lateCount;
+  // const totalStudents = todayAttendanceData.length;
+  // const presentCount = todayAttendanceData.filter(s => s.status).length;
+  // const lateCount = todayAttendanceData.filter(s => s.late && s.status).length;
+  // const absentCount = totalStudents - presentCount;
+  // const livecount = presentCount + lateCount;
+
+
+  const totalStudents = todayAttendanceData.length; // Total number of students
+const presentCount = todayAttendanceData.filter(s => s.status && !s.late).length; // Only on-time present students (green)
+const lateCount = todayAttendanceData.filter(s => s.late && s.status).length; // Latecomers (orange)
+const absentCount = todayAttendanceData.filter(s => !s.status ).length; // Absent students (red)
+const liveCount = presentCount + lateCount; // Total present students (on-time + late)
 
   // Mock subject-wise percentage
   const subjectStats = [
@@ -852,7 +859,7 @@ async function assignStaff() {
       <div className={styles.attendanceStats}>
         <p>Total Students: {totalStudents}</p>
         <p>Present: {presentCount}</p>
-        <p>Live Headcount: {livecount}</p>
+        <p>Live Headcount: {liveCount}</p>
         <p>Latecomers: {lateCount}</p>
         <p>Absent: {absentCount}</p>
       </div>
@@ -1082,13 +1089,13 @@ async function assignStaff() {
               className={`${styles.tabBtn} ${activeTab === 'marks' ? styles.active : ''}`}
               onClick={() => setActiveTab('marks')}
             >
-              <i className="fas fa-book"></i> Marks View
+              <i className="fas fa-book"></i> View Marks
             </button>
             <button 
               className={`${styles.tabBtn} ${activeTab === 'analysis' ? styles.active : ''}`}
               onClick={() => setActiveTab('analysis')}
             >
-              <i className="fas fa-chart-pie"></i> Academic Analysis
+              <i className="fas fa-chart-pie"></i> Academic Insights
             </button>
             <button 
               className={`${styles.tabBtn} ${activeTab === 'students' ? styles.active : ''}`}
@@ -1120,12 +1127,7 @@ async function assignStaff() {
             >
               <i className="fas fa-bell"></i> Send Notification
             </button>
-            <button 
-              className={`${styles.tabBtn} ${activeTab === 'allUsers' ? styles.active : ''}`}
-              onClick={() => setActiveTab('allUsers')}
-            >
-              <i className="fas fa-list"></i> All Users
-            </button>
+            
           </div>
         </div>
 
