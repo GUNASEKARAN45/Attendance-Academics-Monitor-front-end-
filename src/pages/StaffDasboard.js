@@ -257,13 +257,13 @@ const liveCount = presentCount + lateCount; // Total present students (on-time +
       ctx.moveTo(50, y);
       ctx.lineTo(50 + chartWidth, y);
       ctx.stroke();
-      ctx.fillStyle = '#94a3b8';
+      ctx.fillStyle = '#ffffff';
       ctx.fillText((i * (maxY / 5)).toFixed(0) + '%', 10, y + 5);
     }
     ctx.setLineDash([]);
 
     // X labels
-    ctx.fillStyle = '#94a3b8';
+    ctx.fillStyle = '#ffffff';
     labels.forEach((label, index) => {
       const x = 50 + (index * (chartWidth / (labels.length - 1)));
       ctx.fillText(label, x - 10, canvas.height - 10);

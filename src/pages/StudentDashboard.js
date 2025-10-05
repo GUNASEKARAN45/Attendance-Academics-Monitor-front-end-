@@ -639,7 +639,7 @@ const StudentDashboard = () => {
 
     return (
       <div className={styles.scheduleCalendar}>
-        <h3>Schedule Calendar</h3>
+        <h3>Date & Period-wise Attendance Record</h3>
         <div className={styles.calendarHeader}>
           <button className={styles.navBtn} onClick={prevMonth}>
             <span className={styles.navIcon}>&larr;</span>
