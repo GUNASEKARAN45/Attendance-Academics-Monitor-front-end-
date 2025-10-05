@@ -341,7 +341,7 @@ const liveCount = presentCount + lateCount; // Total present students (on-time +
       setTodayAttendanceData(prev =>
         prev.map(s =>
           s.regNo === student.regNo
-            ? { ...s, status: newStatus, late: isLate ? s.late : false }
+            ? { ...s, status: newStatus, late: isLate  }
             : s
         )
       );

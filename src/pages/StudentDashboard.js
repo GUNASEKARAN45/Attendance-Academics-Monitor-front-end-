@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, memo } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styles from '../styles/StudentDashboard.module.css';
 
 const StudentDashboard = () => {
@@ -7,13 +7,21 @@ const StudentDashboard = () => {
   const [timeFilter, setTimeFilter] = useState('day');
   const [showProfilePopup, setShowProfilePopup] = useState(false);
   const [notifications, setNotifications] = useState([]);
-  const [currentMonth, setCurrentMonth] = useState(new Date().getMonth()); // September (8) as of 2025-09-30
+  const [currentMonth, setCurrentMonth] = useState(new Date().getMonth()); // October (9) as of 2025-10-05
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear()); // 2025
   const [todos, setTodos] = useState([]);
   const [newTodo, setNewTodo] = useState('');
   const [editingId, setEditingId] = useState(null);
   const [editingText, setEditingText] = useState('');
   const [showTodoPopup, setShowTodoPopup] = useState(false);
+
+  const [currentWeekStart, setCurrentWeekStart] = useState(() => {
+    const today = new Date(2025, 9, 5);
+    const dow = today.getDay();
+    const monday = new Date(today);
+    monday.setDate(today.getDate() - (dow === 0 ? 6 : dow - 1));
+    return monday;
+  });
 
   // Mock student data
   const studentData = {
@@ -87,75 +95,101 @@ const StudentDashboard = () => {
 
   // Mock notifications data
   const mockNotifications = [
-    { id: 1, type: 'absent', message: 'You were marked absent in Web Development on Monday', date: '2025-09-29', read: false },
-    { id: 2, type: 'low-attendance', message: 'Your attendance in Data Structures is below 75%', date: '2025-09-28', read: false },
-    { id: 3, type: 'exam', message: 'Web Development exam is tomorrow', date: '2025-09-30', read: true },
-    { id: 4, type: 'fail', message: 'You failed in Database Systems', date: '2025-09-27', read: false },
-    { id: 5, type: 'absent', message: 'You were marked absent in Operating Systems on Friday', date: '2025-09-26', read: true }
+    { id: 1, type: 'absent', message: 'You were marked absent in Web Development on Monday', date: '2025-10-04', read: false },
+    { id: 2, type: 'low-attendance', message: 'Your attendance in Data Structures is below 75%', date: '2025-10-03', read: false },
+    { id: 3, type: 'exam', message: 'Web Development exam is tomorrow', date: '2025-10-06', read: true },
+    { id: 4, type: 'fail', message: 'You failed in Database Systems', date: '2025-10-02', read: false },
+    { id: 5, type: 'absent', message: 'You were marked absent in Operating Systems on Friday', date: '2025-10-01', read: true }
   ];
 
   // Mock exam data with exam type
   const exams = [
-    { id: 1, subject: 'Web Development', date: '2025-10-05', type: 'Semester', status: 'upcoming' },
-    { id: 2, subject: 'Data Structures', date: '2025-09-28', type: 'UT', status: 'finished' },
+    { id: 1, subject: 'Web Development', date: '2025-10-06', type: 'Semester', status: 'upcoming' },
+    { id: 2, subject: 'Data Structures', date: '2025-10-03', type: 'UT', status: 'finished' },
     { id: 3, subject: 'Operating Systems', date: '2025-10-10', type: 'Model', status: 'upcoming' },
     { id: 4, subject: 'Software Engineering', date: '2025-09-20', type: 'UT', status: 'finished' },
     { id: 5, subject: 'Internet of Things', date: '2025-10-15', type: 'Semester', status: 'upcoming' }
   ];
-useEffect(() => {
-          document.title = "Attenitix - Student Dashboard";
-        }, []);
 
-  // Initialize notifications
+  // Mock schedule events: One subject per period for each day
+  const subjects = [
+    'Web Development',
+    'Data Structures',
+    'Operating Systems',
+    'Software Engineering',
+    'Internet of Things',
+    'Sensors & Actuators',
+    'Database Systems'
+  ];
+  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const scheduleEvents = [];
+  days.forEach(day => {
+    for (let period = 1; period <= 7; period++) {
+      scheduleEvents.push({
+        id: `${day}-${period}`,
+        subject: subjects[(period - 1) % subjects.length], // Cycle through subjects
+        startPeriod: period,
+        span: 1, // Each event spans one period
+        day: day,
+        // color: ['#ef4444', '#f97316', '#22c55e', '#3b82f6', '#8b5cf6', '#ec4899', '#10b981'][(period - 1) % 7],
+        isPresent: Math.random() > 0.3 // Randomly assign present/absent for demo
+      });
+    }
+  });
+
+  useEffect(() => {
+    document.title = "Attenitix - Student Dashboard";
+  }, []);
+
   useEffect(() => {
     setNotifications(mockNotifications);
   }, []);
 
-  // Delete notification
+  useEffect(() => {
+    const firstDay = new Date(currentYear, currentMonth, 1);
+    const dow = firstDay.getDay();
+    const monday = new Date(firstDay);
+    monday.setDate(firstDay.getDate() - (dow === 0 ? 6 : dow - 1));
+    setCurrentWeekStart(monday);
+  }, [currentMonth, currentYear]);
+
   const deleteNotification = (id) => {
     setNotifications(notifications.filter(notification => notification.id !== id));
   };
 
-  // Mark notification as read
   const markAsRead = (id) => {
     setNotifications(notifications.map(notification => 
       notification.id === id ? { ...notification, read: true } : notification
     ));
   };
 
-  // Get unread notifications count
   const unreadCount = notifications.filter(n => !n.read).length;
 
-  // Generate calendar data for GitHub-like attendance
   const generateCalendarData = () => {
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const currentDate = new Date(currentYear, currentMonth, 1);
+    const firstDay = currentDate.getDay();
     const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-    const firstDay = new Date(currentYear, currentMonth, 1).getDay();
-    
     const calendar = [];
     let day = 1;
-    
-    for (let i = 0; i < firstDay; i++) {
-      calendar.push({ day: null, present: null });
+
+    for (let i = 0; i < (daysInMonth + firstDay); i++) {
+      if (i >= firstDay) {
+        calendar.push({ day, present: Math.random() > 0.3 });
+        day++;
+      } else {
+        calendar.push({ day: null, present: null });
+      }
     }
-    
-    for (let i = 1; i <= daysInMonth; i++) {
-      const date = new Date(currentYear, currentMonth, i);
-      const isSunday = date.getDay() === 0;
-      const present = isSunday ? null : Math.random() > 0.3;
-      calendar.push({ day: i, present, isSunday });
-    }
-    
     return calendar;
   };
 
   const [calendarData, setCalendarData] = useState(generateCalendarData());
 
-  // Update calendar when month/year changes
   useEffect(() => {
     setCalendarData(generateCalendarData());
   }, [currentMonth, currentYear]);
 
-  // Navigate to previous month
   const prevMonth = () => {
     if (currentMonth === 0) {
       setCurrentMonth(11);
@@ -165,7 +199,6 @@ useEffect(() => {
     }
   };
 
-  // Navigate to next month
   const nextMonth = () => {
     if (currentMonth === 11) {
       setCurrentMonth(0);
@@ -175,10 +208,29 @@ useEffect(() => {
     }
   };
 
+  const prevWeek = () => {
+    const newStart = new Date(currentWeekStart);
+    newStart.setDate(newStart.getDate() - 7);
+    setCurrentWeekStart(newStart);
+    const mid = new Date(newStart);
+    mid.setDate(mid.getDate() + 3);
+    setCurrentMonth(mid.getMonth());
+    setCurrentYear(mid.getFullYear());
+  };
+
+  const nextWeek = () => {
+    const newStart = new Date(currentWeekStart);
+    newStart.setDate(newStart.getDate() + 7);
+    setCurrentWeekStart(newStart);
+    const mid = new Date(newStart);
+    mid.setDate(mid.getDate() + 3);
+    setCurrentMonth(mid.getMonth());
+    setCurrentYear(mid.getFullYear());
+  };
+
   const prevSemester = () => setSelectedSemester(Math.max(1, selectedSemester - 1));
   const nextSemester = () => setSelectedSemester(Math.min(8, selectedSemester + 1));
 
-  // To-Do List Functions
   const addTodo = () => {
     if (newTodo.trim()) {
       setTodos([...todos, { id: Date.now(), text: newTodo, completed: false }]);
@@ -209,7 +261,6 @@ useEffect(() => {
     setTodos(todos.filter(todo => todo.id !== id));
   };
 
-  // Profile Popup Component
   const ProfilePopup = () => (
     <div className={styles.profilePopupOverlay}>
       <div className={styles.profilePopup}>
@@ -231,11 +282,9 @@ useEffect(() => {
     </div>
   );
 
-  // Memoized To-Do Popup Component
-  const TodoPopup = memo(() => {
+  const TodoPopup = React.memo(() => {
     const inputRef = useRef(null);
 
-    // Focus input when adding a new todo
     useEffect(() => {
       if (inputRef.current && !editingId) {
         inputRef.current.focus();
@@ -291,7 +340,6 @@ useEffect(() => {
     );
   });
 
-  // Notifications Component
   const Notifications = () => (
     <div className={styles.notificationsSection}>
       <div className={styles.notificationsHeader}>
@@ -340,7 +388,6 @@ useEffect(() => {
     </div>
   );
 
-  // Today's Attendance Component
   const TodayAttendance = () => (
     <div className={styles.todayAttendance}>
       <h3>Today's Attendance</h3>
@@ -357,28 +404,21 @@ useEffect(() => {
     </div>
   );
 
-  // Attendance Chart Component
   const AttendanceChart = () => {
     const canvasRef = useRef(null);
     const [tooltip, setTooltip] = useState({ visible: false, x: 0, y: 0, content: '' });
     const [animationProgress, setAnimationProgress] = useState(0);
-    const [weekIndex, setWeekIndex] = useState(0); // Start with September
+    const [weekIndex, setWeekIndex] = useState(1); // Start with October
 
     useEffect(() => {
-      // Reset animation progress
       setAnimationProgress(0);
-
       const animate = () => {
         setAnimationProgress((prev) => Math.min(prev + 0.02, 1));
       };
-
       const animationFrame = requestAnimationFrame(function loop() {
         animate();
-        if (animationProgress < 1) {
-          requestAnimationFrame(loop);
-        }
+        if (animationProgress < 1) requestAnimationFrame(loop);
       });
-
       return () => cancelAnimationFrame(animationFrame);
     }, [timeFilter, weekIndex]);
 
@@ -387,19 +427,14 @@ useEffect(() => {
       const ctx = canvas.getContext('2d');
       const width = canvas.width;
       const height = canvas.height;
-      const padding = 60; // Increased for month name below x-axis
+      const padding = 60;
 
-      // Clear canvas
       ctx.clearRect(0, 0, width, height);
 
-      // Calculate attendance percentages
       let labels, dataPoints;
       if (timeFilter === 'day') {
         labels = attendanceData.day.labels;
-        dataPoints = attendanceData.day.data.map(day => {
-          const presentCount = day.filter(p => p).length;
-          return (presentCount / day.length) * 100;
-        });
+        dataPoints = attendanceData.day.data.map(day => (day.filter(p => p).length / day.length) * 100);
       } else {
         labels = attendanceData.week.months[weekIndex].labels;
         dataPoints = attendanceData.week.months[weekIndex].data;
@@ -407,7 +442,7 @@ useEffect(() => {
 
       const dataLength = labels.length;
       const pointSpacing = (width - padding * 2) / (dataLength - 1);
-      const maxAttendance = 100; // Max percentage
+      const maxAttendance = 100;
       const points = dataPoints.map((value, i) => ({
         x: padding + i * pointSpacing,
         y: height - padding - (value / maxAttendance) * (height - padding * 2),
@@ -415,7 +450,6 @@ useEffect(() => {
         label: labels[i]
       }));
 
-      // Draw grid lines
       ctx.strokeStyle = '#4b5563';
       ctx.lineWidth = 1;
       ctx.setLineDash([5, 5]);
@@ -432,7 +466,6 @@ useEffect(() => {
       }
       ctx.setLineDash([]);
 
-      // Draw labels
       ctx.fillStyle = '#e2e8f0';
       ctx.font = 'bold 12px Inter';
       ctx.textAlign = 'center';
@@ -441,14 +474,9 @@ useEffect(() => {
       });
       if (timeFilter === 'week') {
         ctx.font = 'bold 12px Inter';
-        ctx.fillText(
-          attendanceData.week.months[weekIndex].name,
-          width / 2,
-          height - padding + 40
-        );
+        ctx.fillText(attendanceData.week.months[weekIndex].name, width / 2, height - padding + 40);
       }
 
-      // Draw animated line and filled area
       const gradient = ctx.createLinearGradient(0, 0, 0, height);
       gradient.addColorStop(0, 'rgba(59, 130, 246, 0.8)');
       gradient.addColorStop(1, 'rgba(59, 130, 246, 0.2)');
@@ -462,12 +490,7 @@ useEffect(() => {
         ctx.quadraticCurveTo(prev.x, prev.y, xc, yc);
       }
       if (animationProgress >= 1) {
-        ctx.quadraticCurveTo(
-          points[points.length - 1].x,
-          points[points.length - 1].y,
-          points[points.length - 1].x,
-          points[points.length - 1].y
-        );
+        ctx.quadraticCurveTo(points[points.length - 1].x, points[points.length - 1].y, points[points.length - 1].x, points[points.length - 1].y);
       }
       ctx.lineTo(points[Math.floor((points.length - 1) * animationProgress)].x, height - padding);
       ctx.lineTo(points[0].x, height - padding);
@@ -475,7 +498,6 @@ useEffect(() => {
       ctx.fillStyle = gradient;
       ctx.fill();
 
-      // Draw line
       ctx.beginPath();
       ctx.moveTo(points[0].x, points[0].y);
       for (let i = 1; i < points.length * animationProgress; i++) {
@@ -489,7 +511,6 @@ useEffect(() => {
       ctx.lineWidth = 2;
       ctx.stroke();
 
-      // Draw points
       points.forEach((point, i) => {
         if (i <= points.length * animationProgress) {
           ctx.beginPath();
@@ -502,7 +523,6 @@ useEffect(() => {
         }
       });
 
-      // Handle tooltips
       const handleMouseMove = (e) => {
         const rect = canvas.getBoundingClientRect();
         const mouseX = e.clientX - rect.left;
@@ -577,7 +597,7 @@ useEffect(() => {
           </div>
         </div>
         <div className={styles.chartContainer}>
-          <canvas ref={canvasRef} width={800} height={280} />
+          <canvas ref={canvasRef} width={800} height={450} />
           {tooltip.visible && (
             <div
               className={styles.tooltip}
@@ -591,7 +611,6 @@ useEffect(() => {
     );
   };
 
-  // Subject Performance Component
   const SubjectPerformance = () => (
     <div className={styles.subjectPerformance}>
       <h3>Subject-wise Performance</h3>
@@ -601,7 +620,7 @@ useEffect(() => {
             <div className={styles.circularProgress}>
               <div 
                 className={styles.progressCircle}
-                style={{ background: `conic-gradient(#10b981 ${subject.percentage * 3.6}deg, #e0e0e0 0deg)` }}
+                style={{ background: `conic-gradient(${subject.percentage < 75 ? '#ef4444' : '#22c55e'} ${subject.percentage * 3.6}deg, #374151 0deg)` }}
               >
                 <span className={styles.percentage}>{subject.percentage}%</span>
               </div>
@@ -613,53 +632,85 @@ useEffect(() => {
     </div>
   );
 
-  // GitHubCalendar Component
-  const GitHubCalendar = () => (
-    <div className={styles.githubCalendar}>
-      <h3>Attendance Calendar</h3>
-      <div className={styles.calendarHeader}>
-        <button className={styles.navBtn} onClick={prevMonth}>
-          <span className={styles.navIcon}>&larr;</span>
-        </button>
-        <span className={styles.currentPeriod}>
-          {new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long' })} {currentYear}
-        </span>
-        <button className={styles.navBtn} onClick={nextMonth}>
-          <span className={styles.navIcon}>&rarr;</span>
-        </button>
-      </div>
-      <div className={styles.calendarGrid}>
-        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, index) => (
-          <div key={index} className={styles.calendarDayLabel}>{day}</div>
-        ))}
-        {calendarData.map((day, index) => (
-          <div 
-            key={index} 
-            className={`${styles.calendarDay} ${day.present === null ? styles.empty : day.isSunday ? styles.holiday : day.present ? styles.present : styles.absent}`}
-            title={day.day ? `Day ${day.day}: ${day.isSunday ? 'Holiday' : day.present ? 'Present' : 'Absent'}` : ''}
-          >
-            <span>{day.day || ''}</span>
-          </div>
-        ))}
-      </div>
-      <div className={styles.calendarLegend}>
-        <div className={styles.legendItem}>
-          <span className={`${styles.legendColor} ${styles.present}`}></span>
-          <span>Present</span>
-        </div>
-        <div className={styles.legendItem}>
-          <span className={`${styles.legendColor} ${styles.absent}`}></span>
-          <span>Absent</span>
-        </div>
-        <div className={styles.legendItem}>
-          <span className={`${styles.legendColor} ${styles.holiday}`}></span>
-          <span>Holiday</span>
-        </div>
-      </div>
-    </div>
-  );
+  const ScheduleCalendar = () => {
+    const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const periods = ['Period 1', 'Period 2', 'Period 3', 'Period 4', 'Period 5', 'Period 6', 'Period 7'];
+    const today = new Date(2025, 9, 5); // October 5, 2025
 
-  // MarksTable Component
+    return (
+      <div className={styles.scheduleCalendar}>
+        <h3>Schedule Calendar</h3>
+        <div className={styles.calendarHeader}>
+          <button className={styles.navBtn} onClick={prevMonth}>
+            <span className={styles.navIcon}>&larr;</span>
+          </button>
+          <span className={styles.currentPeriod}>
+            {new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long' })} {currentYear}
+          </span>
+          <button className={styles.navBtn} onClick={nextMonth}>
+            <span className={styles.navIcon}>&rarr;</span>
+          </button>
+        </div>
+        <div className={styles.weekNav}>
+          <button className={styles.navBtn} onClick={prevWeek}>
+            <span className={styles.navIcon}>&larr;</span>
+          </button>
+          <span className={styles.currentPeriod}>
+            {currentWeekStart.toLocaleDateString('default', { month: 'short', day: 'numeric' })} - {(() => {
+              const end = new Date(currentWeekStart);
+              end.setDate(end.getDate() + 6);
+              return end.toLocaleDateString('default', { month: 'short', day: 'numeric' });
+            })()}
+          </span>
+          <button className={styles.navBtn} onClick={nextWeek}>
+            <span className={styles.navIcon}>&rarr;</span>
+          </button>
+        </div>
+        <div className={styles.calendarGrid}>
+          <div className={styles.timeColumn}>
+            <div className={styles.dayHeader}></div> {/* Empty corner */}
+            {periods.map((period, index) => (
+              <div key={index} className={styles.timeSlot}>{period}</div>
+            ))}
+          </div>
+          {dayNames.map((dayName, i) => {
+            const dayDate = new Date(currentWeekStart);
+            dayDate.setDate(dayDate.getDate() + i);
+            const isToday = dayDate.toDateString() === today.toDateString();
+            return (
+              <div key={i} className={`${styles.dayColumn} ${isToday ? styles.today : ''}`}>
+                <div className={styles.dayHeader}>
+                  {dayName}<br/>{dayDate.getDate()}
+                </div>
+                {periods.map((period, slotIndex) => (
+                  <div key={slotIndex} className={styles.timeSlot}>
+                    {scheduleEvents.filter(e => e.day === dayName && e.startPeriod === (slotIndex + 1)).map(event => (
+                      <div
+                        key={event.id}
+                        className={styles.event}
+                        data-present={event.isPresent}
+                        style={{
+                          height: `${event.span * 60}px`,
+                          top: '0px',
+                          backgroundColor: event.color,
+                          left: '2px',
+                          right: '2px',
+                        }}
+                      >
+                        <span className={styles.eventText}>{event.subject}</span>
+                        {/* <marquee behavior="scroll" direction="left" scrollamount="2">{event.subject}</marquee> */}
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
   const MarksTable = () => (
     <div className={styles.marksTable}>
       <div className={styles.contentHeader}>
@@ -710,7 +761,6 @@ useEffect(() => {
     </div>
   );
 
-  // ExamSchedule Component
   const ExamSchedule = () => {
     const upcomingExams = exams.filter(exam => exam.status === 'upcoming');
     const finishedExams = exams.filter(exam => exam.status === 'finished');
@@ -797,13 +847,12 @@ useEffect(() => {
     );
   };
 
-  // OverallAttendance Component
   const OverallAttendance = () => (
     <div className={styles.overallAttendance}>
       <div className={styles.attendanceCircle}>
         <div 
           className={styles.circleProgress}
-          style={{ background: `conic-gradient(#10b981 ${attendanceData.semester.overall * 3.6}deg, #e0e0e0 0deg)` }}
+          style={{ background: `conic-gradient(${attendanceData.semester.overall < 75 ? '#ef4444' : '#22c55e'} ${attendanceData.semester.overall * 3.6}deg, #374151 0deg)` }}
         >
           <span className={styles.percentage}>{attendanceData.semester.overall}%</span>
         </div>
@@ -818,7 +867,6 @@ useEffect(() => {
   return (
     <div className={styles.studentDashboard}>
       <div className={styles.container}>
-        {/* Sidebar */}
         <div className={styles.sidebar}>
           <div 
             className={styles.profileSection}
@@ -857,7 +905,6 @@ useEffect(() => {
           <Notifications />
         </div>
 
-        {/* Content */}
         <div className={styles.content}>
           {activeTab === 'attendance' ? (
             <>
@@ -884,7 +931,7 @@ useEffect(() => {
               </div>
               <SubjectPerformance />
               <AttendanceChart />
-              <GitHubCalendar />
+              <ScheduleCalendar />
             </>
           ) : activeTab === 'academic' ? (
             <>
