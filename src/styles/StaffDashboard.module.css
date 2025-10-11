@@ -912,7 +912,15 @@ tr:hover {
 }
 
 .closeBtn {
-  background: #6b7280;
+  background: #ef4444; /* Changed to red */
+  color: #ffffff;
+  border: none;
+  padding: 0.7rem 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex: 1;
+  font-weight: 500;
 }
 
 .changePasswordBtn:hover,

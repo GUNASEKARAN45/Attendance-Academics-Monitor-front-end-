@@ -1,6 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { QRCodeCanvas } from 'qrcode.react';
 import styles from '../styles/StaffDashboard.module.css';
+import ProfilePopup from '../components/Staffpage/ProfilePopup';
+import StudentPopup from '../components/Staffpage/StudentPopup';
+import EditAttendancePopup from '../components/Staffpage/EditAttendancePopup';
+import Notifications from '../components/Staffpage/Notifications';
+import TodayAttendance from '../components/Staffpage/TodayAttendance';
+import SubjectWisePercentage from '../components/Staffpage/SubjectWisePercentage';
+import CombinedAttendanceChart from '../components/Staffpage/CombinedAttendanceChart';
+import MarksTable from '../components/Staffpage/MarksTable';
+import AcademicInsights from '../components/Staffpage/AcademicInsights';
+import StudentInsights from '../components/Staffpage/StudentInsights';
+import TakeAttendance from '../components/Staffpage/TakeAttendance';
 
 const StaffDashboard = () => {
   const [activeTab, setActiveTab] = useState('attendance');
@@ -15,17 +25,6 @@ const StaffDashboard = () => {
   const [showStudentPopup, setShowStudentPopup] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [showEditAttendance, setShowEditAttendance] = useState(null);
-  const canvasRef = useRef(null);
-
-  // Mock staff data
-  const staffData = {
-    staffId: "STF001",
-    name: "Mrs. Suriya",
-    department: "ECE",
-    designation: "Assistant Professor"
-  };
-
-  // Adjusted mock today's attendance data
   const [todayAttendanceData, setTodayAttendanceData] = useState([
     { regNo: "EC001", status: true },
     { regNo: "EC002", status: true },
@@ -59,22 +58,15 @@ const StaffDashboard = () => {
     { regNo: "EC030", status: false },
   ]);
 
-  // Calculate attendance stats
-  // const totalStudents = todayAttendanceData.length;
-  // const presentCount = todayAttendanceData.filter(s => s.status ).length;
-  // const lateCount = todayAttendanceData.filter(s => s.late && s.status).length;
-  // const absentCount = totalStudents - presentCount;
-  // const liveCount = presentCount + lateCount;
+  // Mock staff data
+  const staffData = {
+    staffId: "STF001",
+    name: "Mrs. Suriya",
+    department: "ECE",
+    designation: "Assistant Professor"
+  };
 
-  // Calculate attendance stats
-const totalStudents = todayAttendanceData.length; // Total number of students
-const presentCount = todayAttendanceData.filter(s => s.status && !s.late).length; // Only on-time present students (green)
-const lateCount = todayAttendanceData.filter(s => s.late && s.status).length; // Latecomers (orange)
-const absentCount = todayAttendanceData.filter(s => !s.status ).length; // Absent students (red)
-const liveCount = presentCount + lateCount; // Total present students (on-time + late)
-
-
-  // Mock subject-wise percentage
+  // Mock data for components
   const subjectStats = [
     { name: 'Web Development', percentage: 85 },
     { name: 'Data Structures', percentage: 78 },
@@ -83,7 +75,6 @@ const liveCount = presentCount + lateCount; // Total present students (on-time +
     { name: 'Signals & Systems', percentage: 100 },
   ];
 
-  // Mock combined attendance data without daily
   const combinedAttendanceData = {
     weekly: {
       labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
@@ -105,7 +96,6 @@ const liveCount = presentCount + lateCount; // Total present students (on-time +
     }
   };
 
-  // Mock students data
   const studentsData = [
     {
       regNo: "AC22UEC001",
@@ -130,7 +120,6 @@ const liveCount = presentCount + lateCount; // Total present students (on-time +
     },
   ];
 
-  // Mock insights
   const attendanceInsights = [
     { message: 'Students continuously absent on Friday and Saturday' },
     { message: 'Less number of students present in the last week' },
@@ -147,7 +136,6 @@ const liveCount = presentCount + lateCount; // Total present students (on-time +
     { message: 'Top performers consistently scoring above 90%' },
   ];
 
-  // Mock notifications
   const mockNotifications = [
     { id: 1, type: 'low-attendance', message: 'Class attendance below 75% in Web Development', date: '2023-10-23', read: false },
     { id: 2, type: 'exam', message: 'Schedule exam for Data Structures', date: '2023-10-22', read: false },
@@ -157,8 +145,8 @@ const liveCount = presentCount + lateCount; // Total present students (on-time +
   ];
 
   useEffect(() => {
-          document.title = "Attenitix - Staff Dashboard";
-        }, []);
+    document.title = "Attenitix - Staff Dashboard - 10:04 PM IST, Oct 11, 2025";
+  }, []);
 
   useEffect(() => {
     setNotifications(mockNotifications);
@@ -174,621 +162,10 @@ const liveCount = presentCount + lateCount; // Total present students (on-time +
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
+  const canvasRef = useRef(null);
+
   const drawChart = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) {
-      console.error('Canvas not found');
-      return;
-    }
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) {
-      console.error('Canvas context not available');
-      return;
-    }
-
-    canvas.width = 500;
-    canvas.height = 350;
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    const data = combinedAttendanceData[timeFilter];
-    if (!data || !data.labels || !data.data) {
-      console.error('Invalid data for chart');
-      return;
-    }
-
-    const labels = data.labels;
-    const values = data.data[selectedSubject] || [];
-
-    if (!values.length) {
-      console.error('No values for selected subject:', selectedSubject);
-      return;
-    }
-
-    const maxY = Math.max(...values, 100);
-    const chartWidth = canvas.width - 100;
-    const chartHeight = canvas.height - 70;
-
-    // Fill area
-    ctx.beginPath();
-    ctx.moveTo(50, chartHeight + 20);
-    values.forEach((value, index) => {
-      const x = 50 + (index * (chartWidth / (values.length - 1)));
-      const y = 20 + chartHeight - (value / maxY) * chartHeight;
-      ctx.lineTo(x, y);
-    });
-    ctx.lineTo(50 + chartWidth, chartHeight + 20);
-    ctx.closePath();
-    ctx.fillStyle = 'rgba(59, 130, 246, 0.2)';
-    ctx.fill();
-
-    // Line
-    ctx.beginPath();
-    ctx.strokeStyle = '#3b82f6';
-    ctx.lineWidth = 2;
-    values.forEach((value, index) => {
-      const x = 50 + (index * (chartWidth / (values.length - 1)));
-      const y = 20 + chartHeight - (value / maxY) * chartHeight;
-      if (index === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    });
-    ctx.stroke();
-
-    // Points and labels
-    ctx.fillStyle = '#3b82f6';
-    values.forEach((value, index) => {
-      const x = 50 + (index * (chartWidth / (labels.length - 1)));
-      const y = 20 + chartHeight - (value / maxY) * chartHeight;
-      ctx.beginPath();
-      ctx.arc(x, y, 4, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = '#f8fafc';
-      ctx.font = '10px Inter';
-      ctx.fillText(value + '%', x - 10, y - 5);
-    });
-
-    // Grid lines
-    ctx.strokeStyle = '#4b5563';
-    ctx.setLineDash([5, 5]);
-    for (let i = 0; i <= 5; i++) {
-      const y = 20 + chartHeight - (i / 5) * chartHeight;
-      ctx.beginPath();
-      ctx.moveTo(50, y);
-      ctx.lineTo(50 + chartWidth, y);
-      ctx.stroke();
-      ctx.fillStyle = '#ffffff';
-      ctx.fillText((i * (maxY / 5)).toFixed(0) + '%', 10, y + 5);
-    }
-    ctx.setLineDash([]);
-
-    // X labels
-    ctx.fillStyle = '#ffffff';
-    labels.forEach((label, index) => {
-      const x = 50 + (index * (chartWidth / (labels.length - 1)));
-      ctx.fillText(label, x - 10, canvas.height - 10);
-    });
-
-    if (timeFilter === 'monthly') {
-      const month = new Date(2025, 8 + currentWeek, 1).toLocaleString('default', { month: 'long' });
-      ctx.fillText(month, canvas.width / 2 - 20, canvas.height - 10);
-    }
-  };
-
-  const ProfilePopup = () => (
-    <div className={styles.profilePopupOverlay}>
-      <div className={styles.profilePopup}>
-        <h3>Staff Profile</h3>
-        <div className={styles.profileInfo}>
-          <p><strong>Name:</strong> {staffData.name}</p>
-          <p><strong>Staff ID:</strong> {staffData.staffId}</p>
-          <p><strong>Department:</strong> {staffData.department}</p>
-          <p><strong>Designation:</strong> {staffData.designation}</p>
-        </div>
-        <div className={styles.profileActions}>
-          <button className={styles.changePasswordBtn}>Change Password</button>
-          <button className={styles.logoutBtn}>Logout</button>
-        </div>
-        <button className={styles.closeBtn} onClick={() => setShowProfilePopup(false)}>Close</button>
-      </div>
-    </div>
-  );
-
-  const StudentPopup = () => {
-    if (!selectedStudent) return null;
-    return (
-      <div className={styles.studentPopupOverlay}>
-        <div className={styles.studentPopup}>
-          <h3>{selectedStudent.name}'s Details</h3>
-          <div className={styles.studentInfo}>
-            <div className={styles.infoRow}>
-              <span className={styles.infoLabel}>Reg No:</span>
-              <span>{selectedStudent.regNo}</span>
-            </div>
-            <div className={styles.infoRow}>
-              <span className={styles.infoLabel}>Attendance:</span>
-              <span className={selectedStudent.attendancePercentage < 75 ? styles.lowAttendance : ''}>
-                {selectedStudent.attendancePercentage}%
-              </span>
-            </div>
-            <div className={styles.marksSection}>
-              <h4>Marks</h4>
-              <div className={styles.marksGrid}>
-                <span>UT1: {selectedStudent.marks.ut1}</span>
-                <span>UT2: {selectedStudent.marks.ut2}</span>
-                <span>UT3: {selectedStudent.marks.ut3}</span>
-                <span>Model1: {selectedStudent.marks.model1}</span>
-                <span>Sem: {selectedStudent.marks.sem}</span>
-              </div>
-            </div>
-            <div className={styles.insightsSection}>
-              <h4>Predictive Analysis</h4>
-              <ul className={styles.insightsList}>
-                {selectedStudent.insights.map((insight, index) => (
-                  <li key={index}>{insight}</li>
-                ))}
-              </ul>
-            </div>
-          </div>
-          <button className={`${styles.closeBtn} ${styles.redCloseBtn}`} onClick={() => { setShowStudentPopup(false); setSelectedStudent(null); }}>Close</button>
-        </div>
-      </div>
-    );
-  };
-
-  const EditAttendancePopup = ({ student, onClose }) => {
-    const handleStatusChange = (newStatus, isLate = false) => {
-      setTodayAttendanceData(prev =>
-        prev.map(s =>
-          s.regNo === student.regNo
-            ? { ...s, status: newStatus, late: isLate  }
-            : s
-        )
-      );
-      onClose();
-    };
-
-    return (
-      <div className={styles.studentPopupOverlay}>
-        <div className={styles.studentPopup}>
-          <h3>Edit Attendance for {student.regNo}</h3>
-          <div className={styles.profileActions}>
-            {student.status ? (
-              <>
-                <button
-                  className={styles.saveBtn}
-                  onClick={() => handleStatusChange(false)}
-                >
-                  Mark as Absent
-                </button>
-                {student.late && (
-                  <button
-                    className={styles.saveBtn}
-                    onClick={() => handleStatusChange(true, false)}
-                  >
-                    Mark as Present (Not Late)
-                  </button>
-                )}
-              </>
-            ) : (
-              <>
-                <button
-                  className={styles.saveBtn}
-                  onClick={() => handleStatusChange(true, false)}
-                >
-                  Mark as Present
-                </button>
-                <button
-                  className={styles.saveBtn}
-                  onClick={() => handleStatusChange(true, true)}
-                >
-                  Mark as Late
-                </button>
-              </>
-            )}
-            <button
-              className={`${styles.closeBtn} ${styles.redCloseBtn}`}
-              onClick={onClose}
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  const Notifications = () => (
-    <div className={styles.notificationsSection}>
-      <div className={styles.notificationsHeader}>
-        <h3>Notifications</h3>
-        <span className={styles.badge}>{unreadCount}</span>
-      </div>
-      <div className={styles.notificationsList}>
-        {notifications.length > 0 ? (
-          notifications.map(notification => (
-            <div key={notification.id} className={`${styles.notificationItem} ${notification.read ? styles.read : styles.unread}`}>
-              <div className={styles.notificationContent}>
-                <span className={`${styles.notificationIcon} ${styles[notification.type]}`}>
-                  {notification.type === 'low-attendance' ? '⚠️' :
-                    notification.type === 'exam' ? '📝' :
-                    notification.type === 'fail' ? '🚫' :
-                    notification.type === 'meeting' ? '🗓️' : '🔄'}
-                </span>
-                <div>
-                  <p className={styles.notificationMessage}>{notification.message}</p>
-                  <span className={styles.notificationDate}>{notification.date}</span>
-                </div>
-              </div>
-              <div className={styles.notificationActions}>
-                {!notification.read && (
-                  <button className={styles.markReadBtn} onClick={() => markAsRead(notification.id)} title="Mark as read">✓</button>
-                )}
-                <button className={styles.deleteBtn} onClick={() => deleteNotification(notification.id)} title="Delete notification">×</button>
-              </div>
-            </div>
-          ))
-        ) : (
-          <p className={styles.noNotifications}>No notifications</p>
-        )}
-      </div>
-    </div>
-  );
-
-  const TodayAttendance = () => (
-    <div className={styles.todayAttendance}>
-      <h3>Today's Student Attendance</h3>
-      <div className={styles.attendanceStats}>
-        <p>Total Students: {totalStudents}</p>
-        <p>Present: {presentCount}</p>
-        <p>Live Headcount: {liveCount}</p>
-        <p>Latecomers: {lateCount}</p>
-        <p>Absent: {absentCount}</p>
-      </div>
-      <div className={styles.attendanceGrid}>
-        {todayAttendanceData.map((student, index) => (
-          <div
-            key={index}
-            className={styles.studentIcon}
-            onClick={() => setShowEditAttendance(student)}
-            style={{ cursor: 'pointer' }}
-          >
-            <div
-              className={`${styles.icon} ${student.status ? (student.late ? styles.late : styles.present) : styles.absent}`}
-              style={{ backgroundImage: `url(https://static.thenounproject.com/png/1594252-200.png)`, backgroundSize: 'cover' }}
-            >
-              {student.late && <span className={styles.tooltip}>Late Comer</span>}
-            </div>
-            <span>{student.regNo}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-
-  const SubjectWisePercentage = () => (
-    <div className={styles.subjectPerformance}>
-      <h3>Subject-wise Average Attendance</h3>
-      <div className={styles.subjectsGrid}>
-        {subjectStats.map((subject, index) => (
-          <div key={index} className={styles.subjectCard}>
-            <div className={styles.circularProgress}>
-              <div
-                className={styles.progressCircle}
-                style={{
-                  background: `conic-gradient(#10b981 ${subject.percentage * 3.6}deg, #2d3748 0deg)`
-                }}
-              >
-                <span className={styles.percentage}>{subject.percentage}%</span>
-              </div>
-            </div>
-            <h4>{subject.name}</h4>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-
-  const CombinedAttendanceChart = () => {
-    const handlePrev = () => setCurrentWeek(prev => Math.max(prev - 1, 0));
-    const handleNext = () => setCurrentWeek(prev => prev + 1);
-
-    useEffect(() => {
-      if (activeTab === 'attendance' && canvasRef.current) {
-        // Use setTimeout to ensure canvas is ready
-        const timer = setTimeout(() => {
-          console.log('Drawing chart:', { timeFilter, selectedSubject });
-          drawChart();
-        }, 0);
-        return () => clearTimeout(timer);
-      }
-    }, [activeTab, timeFilter, currentWeek, selectedSubject]);
-
-    return (
-      <div className={styles.attendanceChart}>
-        <div className={styles.chartHeader}>
-          <h3>{timeFilter.charAt(0).toUpperCase() + timeFilter.slice(1)} Combined Attendance</h3>
-          <div className={styles.filters}>
-            <select value={timeFilter} onChange={(e) => setTimeFilter(e.target.value)} className={styles.filterSelect}>
-              <option value="weekly">Weekly</option>
-              <option value="monthly">Monthly</option>
-            </select>
-            {timeFilter === 'monthly' && (
-              <div>
-                <button className={styles.navBtn} onClick={handlePrev} disabled={currentWeek === 0}>Prev</button>
-                <button className={styles.navBtn} onClick={handleNext}>Next</button>
-              </div>
-            )}
-          </div>
-        </div>
-        <div style={{ position: 'relative', width: '900px', height: '400px' }}>
-          <canvas ref={canvasRef} width="500" height="380"></canvas>
-        </div>
-      </div>
-    );
-  };
-
-  const MarksTable = () => {
-    const handleSave = (index) => {
-      const inputs = document.querySelectorAll(`.${styles.markInput}`);
-      const ut1 = Math.min(50, Math.max(0, parseInt(inputs[index * 5].value) || 0));
-      const ut2 = Math.min(50, Math.max(0, parseInt(inputs[index * 5 + 1].value) || 0));
-      const ut3 = Math.min(50, Math.max(0, parseInt(inputs[index * 5 + 2].value) || 0));
-      const model1 = Math.min(100, Math.max(0, parseInt(inputs[index * 5 + 3].value) || 0));
-      const sem = Math.min(100, Math.max(0, parseInt(inputs[index * 5 + 4].value) || 0));
-      // Update studentsData or API here
-      alert('Marks saved!');
-    };
-
-    return (
-      <div className={styles.marksTable}>
-        <h3>Enter/Edit Marks for {selectedSubject}</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Reg No</th>
-              <th>Name</th>
-              <th>UT1</th>
-              <th>UT2</th>
-              <th>UT3</th>
-              <th>Model1</th>
-              <th>Sem</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {studentsData.map((student, index) => (
-              <tr key={index} className={student.marks.sem < 50 ? styles.fail : ''}>
-                <td>{student.regNo}</td>
-                <td>{student.name}</td>
-                <td><input type="number" defaultValue={student.marks.ut1} min="0" max="50" className={styles.markInput} /></td>
-                <td><input type="number" defaultValue={student.marks.ut2} min="0" max="50" className={styles.markInput} /></td>
-                <td><input type="number" defaultValue={student.marks.ut3} min="0" max="50" className={styles.markInput} /></td>
-                <td><input type="number" defaultValue={student.marks.model1} min="0" max="100" className={styles.markInput} /></td>
-                <td><input type="number" defaultValue={student.marks.sem} min="0" max="100" className={styles.markInput} /></td>
-                <td><button className={styles.saveBtn} onClick={() => handleSave(index)}>Save</button></td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    );
-  };
-
-  const AcademicInsights = () => (
-    <div className={styles.academicInsights}>
-      <h3>Academic Insights</h3>
-      <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
-        <div style={{ flex: 1, minWidth: '300px' }}>
-          <h4 style={{ fontSize: '1rem', color: '#bfdbfe', marginBottom: '0.8rem', borderBottom: '1px solid #334155', paddingBottom: '0.5rem' }}>Attendance Insights</h4>
-          <ul className={styles.insightsList} style={{ listStyle: 'none', padding: 0 }}>
-            {attendanceInsights.map((insight, index) => (
-              <li key={index} style={{ marginBottom: '0.8rem', padding: '0.8rem', background: '#374151', borderRadius: '8px', boxShadow: '0 2px 6px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                {insight.message}
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div style={{ flex: 1, minWidth: '300px' }}>
-          <h4 style={{ fontSize: '1rem', color: '#bfdbfe', marginBottom: '0.8rem', borderBottom: '1px solid #334155', paddingBottom: '0.5rem' }}>Marks Insights</h4>
-          <ul className={styles.insightsList} style={{ listStyle: 'none', padding: 0 }}>
-            {marksInsights.map((insight, index) => (
-              <li key={index} style={{ marginBottom: '0.8rem', padding: '0.8rem', background: '#374151', borderRadius: '8px', boxShadow: '0 2px 6px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                {insight.message}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    </div>
-  );
-
-  const StudentInsights = () => (
-    <div className={styles.studentInsights}>
-      <h3>Students List for {selectedSubject}</h3>
-      <p className={styles.smallText}>*Click on the student to see their preview and insights</p>
-      <table>
-        <thead>
-          <tr>
-            <th>Reg No</th>
-            <th>Name</th>
-          </tr>
-        </thead>
-        <tbody>
-          {studentsData.map((student, index) => (
-            <tr key={index} onClick={() => { setSelectedStudent(student); setShowStudentPopup(true); }} style={{ cursor: 'pointer' }}>
-              <td>{student.regNo}</td>
-              <td>{student.name}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-
-  const TakeAttendance = () => {
-    const [classType, setClassType] = useState('offline');
-    const [period, setPeriod] = useState('Period 1');
-    const [endTime, setEndTime] = useState('');
-    const [sessionToken, setSessionToken] = useState('');
-    const [inputToken, setInputToken] = useState('');
-    const [pairing, setPairing] = useState(false);
-    const [qrCode, setQrCode] = useState('');
-    const [cameras] = useState(['Camera1 (MAC: 00:14:22:01:23:45) [ECE-A]', 'Camera2 (MAC: 00:14:22:01:23:46) [ECE-B]',, 'Camera3 (MAC: 00:14:22:01:23:47) [CN LAB]']);
-    const [endTimeOptions, setEndTimeOptions] = useState([]);
-
-    const periodStartTimes = {
-      'Period 1': { hour: 8, min: 30, ampm: 'AM' },
-      'Period 2': { hour: 9, min: 25, ampm: 'AM' },
-      'Period 3': { hour: 10, min: 30, ampm: 'AM' },
-      'Period 4': { hour: 11, min: 25, ampm: 'AM' },
-      'Period 5': { hour: 1, min: 20, ampm: 'PM' },
-      'Period 6': { hour: 2, min: 15, ampm: 'PM' },
-      'Period 7': { hour: 3, min: 5, ampm: 'PM' },
-    };
-
-    const periodOrder = ['Period 1', 'Period 2', 'Period 3', 'Period 4', 'Period 5', 'Period 6', 'Period 7'];
-
-    const generateSessionToken = () => {
-      return Math.random().toString(36).substring(2, 8).toUpperCase();
-    };
-
-    useEffect(() => {
-      if (!sessionToken) {
-        setSessionToken(generateSessionToken());
-      }
-    }, []);
-
-    const addMinutesToTime = (hour, min, ampm, addMin) => {
-      let totalMin = hour * 60 + min + addMin;
-      let newHour = Math.floor(totalMin / 60) % 24;
-      let newMin = totalMin % 60;
-      let newAmpm = ampm;
-      if (newHour >= 12) {
-        newAmpm = 'PM';
-        if (newHour > 12) newHour -= 12;
-      } else {
-        newAmpm = 'AM';
-      }
-      if (newHour === 0) newHour = 12;
-      return `${newHour}:${newMin < 10 ? '0' + newMin : newMin} ${newAmpm}`;
-    };
-
-    useEffect(() => {
-      const currentStart = periodStartTimes[period];
-      const currentIndex = periodOrder.indexOf(period);
-      const nextStart = currentIndex < periodOrder.length - 1 ? periodStartTimes[periodOrder[currentIndex + 1]] : { hour: 4, min: 0, ampm: 'PM' };
-
-      let currentHour = currentStart.hour;
-      if (currentStart.ampm === 'PM' && currentStart.hour !== 12) currentHour += 12;
-
-      let nextHour = nextStart.hour;
-      if (nextStart.ampm === 'PM' && nextStart.hour !== 12) nextHour += 12;
-
-      const currentTotalMin = currentHour * 60 + currentStart.min;
-      const nextTotalMin = nextHour * 60 + nextStart.min;
-
-      const options = [];
-      for (let time = currentTotalMin + 5; time < nextTotalMin; time += 5) {
-        let optHour = Math.floor(time / 60) % 24;
-        let optMin = time % 60;
-        let optAmpm = optHour < 12 ? 'AM' : 'PM';
-        if (optHour > 12) optHour -= 12;
-        if (optHour === 0) optHour = 12;
-        options.push(`${optHour}:${optMin < 10 ? '0' + optMin : optMin} ${optAmpm}`);
-      }
-
-      setEndTimeOptions(options);
-      setEndTime(options[0] || '');
-    }, [period]);
-
-    const handlePair = () => {
-      setPairing(true);
-      setTimeout(() => {
-        setPairing(false);
-        if (inputToken === sessionToken) {
-          alert('Pairing successful. Taking attendance now...');
-        } else {
-          alert('Invalid token!');
-        }
-      }, 2000);
-    };
-
-    const generateQrCode = () => {
-      const data = `${selectedDepartment}-${selectedYear}-${selectedSection}-${selectedSubject}`;
-      setQrCode(data);
-    };
-
-    return (
-      <div className={styles.takeAttendance}>
-        <h3>Take Attendance</h3>
-        <div className={styles.attendanceFilters}>
-          <div className={styles.filterGroup}>
-            <label>Class Type:</label>
-            <select value={classType} onChange={(e) => setClassType(e.target.value)} className={styles.filterSelect}>
-              <option value="offline">Offline</option>
-              <option value="online">Online</option>
-            </select>
-          </div>
-          <div className={styles.filterGroup}>
-            <label>Period:</label>
-            <select value={period} onChange={(e) => setPeriod(e.target.value)} className={styles.filterSelect}>
-              <option value="Period 1">Period 1 (8:30 AM)</option>
-              <option value="Period 2">Period 2 (9:25 AM)</option>
-              <option value="Period 3">Period 3 (10:30 AM)</option>
-              <option value="Period 4">Period 4 (11:25 AM)</option>
-              <option value="Period 5">Period 5 (1:20 PM)</option>
-              <option value="Period 6">Period 6 (2:15 PM)</option>
-              <option value="Period 7">Period 7 (3:05 PM)</option>
-            </select>
-          </div>
-          <div className={styles.filterGroup}>
-            <label>End Time:</label>
-            <select value={endTime} onChange={(e) => setEndTime(e.target.value)} className={styles.filterSelect}>
-              {endTimeOptions.map((opt, index) => (
-                <option key={index} value={opt}>{opt}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-        {classType === 'offline' && (
-          <div className={styles.pairingSection}>
-            <p>Session Token: <span className={styles.sessionToken}>{sessionToken}</span></p>
-            <div className={styles.pairInput}>
-              <select className={styles.filterSelect}>
-                {cameras.map((cam, index) => <option key={index} value={cam}>{cam}</option>)}
-              </select>
-              <input
-                type="text"
-                value={inputToken}
-                onChange={(e) => setInputToken(e.target.value)}
-                placeholder="Enter Session Token"
-                className={styles.filterSelect}
-                style={{ width: '200px' }}
-              />
-              <button
-                className={styles.pairBtn}
-                onClick={handlePair}
-                disabled={!sessionToken || pairing}
-              >
-                {pairing ? 'Pairing...' : 'Pair'}
-              </button>
-            </div>
-            {pairing && <p className={styles.pairStatus}>Pairing successful. Taking attendance now...</p>}
-          </div>
-        )}
-        {classType === 'online' && (
-          <div className={styles.qrCode}>
-            <div className={styles.qrPlaceholder}>
-              {qrCode ? <QRCodeCanvas value={qrCode} size={140} style={{ width: '100%', height: '100%', objectFit: 'contain' }} /> : 'Generate QR Code'}
-            </div>
-            <button className={styles.shareQrBtn} onClick={generateQrCode} disabled={!!qrCode}>
-              {qrCode ? 'Share QR' : 'Generate QR'}
-            </button>
-          </div>
-        )}
-      </div>
-    );
+    console.log('Chart drawing function - implement in component');
   };
 
   return (
@@ -819,7 +196,12 @@ const liveCount = presentCount + lateCount; // Total present students (on-time +
               <i className="fas fa-users"></i> Student Insights
             </button>
           </div>
-          <Notifications />
+          <Notifications 
+            notifications={notifications}
+            unreadCount={unreadCount}
+            onDelete={deleteNotification}
+            onMarkAsRead={markAsRead}
+          />
         </div>
         <div className={styles.content}>
           <h2>{activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Dashboard</h2>
@@ -865,21 +247,64 @@ const liveCount = presentCount + lateCount; // Total present students (on-time +
 
           {activeTab === 'attendance' && (
             <>
-              <TodayAttendance />
-              <SubjectWisePercentage />
-              <CombinedAttendanceChart />
+              <TodayAttendance 
+                todayAttendanceData={todayAttendanceData}
+                setShowEditAttendance={setShowEditAttendance}
+              />
+              <SubjectWisePercentage subjectStats={subjectStats} />
+              <CombinedAttendanceChart 
+                timeFilter={timeFilter}
+                setTimeFilter={setTimeFilter}
+                currentWeek={currentWeek}
+                setCurrentWeek={setCurrentWeek}
+                selectedSubject={selectedSubject}
+                combinedAttendanceData={combinedAttendanceData}
+                canvasRef={canvasRef}
+                drawChart={drawChart}
+                activeTab={activeTab}
+              />
             </>
           )}
-          {activeTab === 'marks' && <MarksTable />}
-          {activeTab === 'academicInsights' && <AcademicInsights />}
-          {activeTab === 'studentInsights' && <StudentInsights />}
-          {activeTab === 'takeAttendance' && <TakeAttendance />}
+          {activeTab === 'marks' && (
+            <MarksTable 
+              selectedSubject={selectedSubject}
+              studentsData={studentsData}
+            />
+          )}
+          {activeTab === 'academicInsights' && (
+            <AcademicInsights 
+              attendanceInsights={attendanceInsights}
+              marksInsights={marksInsights}
+            />
+          )}
+          {activeTab === 'studentInsights' && (
+            <StudentInsights 
+              selectedSubject={selectedSubject}
+              studentsData={studentsData}
+              setSelectedStudent={setSelectedStudent}
+              setShowStudentPopup={setShowStudentPopup}
+            />
+          )}
+          {activeTab === 'takeAttendance' && (
+            <TakeAttendance 
+              selectedDepartment={selectedDepartment}
+              selectedYear={selectedYear}
+              selectedSection={selectedSection}
+              selectedSubject={selectedSubject}
+            />
+          )}
         </div>
       </div>
 
-      {showProfilePopup && <ProfilePopup />}
-      {showStudentPopup && <StudentPopup />}
-      {showEditAttendance && <EditAttendancePopup student={showEditAttendance} onClose={() => setShowEditAttendance(null)} />}
+      {showProfilePopup && <ProfilePopup setShowProfilePopup={setShowProfilePopup} staffData={staffData} />}
+      {showStudentPopup && selectedStudent && <StudentPopup selectedStudent={selectedStudent} onClose={() => { setShowStudentPopup(false); setSelectedStudent(null); }} />}
+      {showEditAttendance && (
+        <EditAttendancePopup 
+          student={showEditAttendance}
+          onClose={() => setShowEditAttendance(null)}
+          setTodayAttendanceData={setTodayAttendanceData}
+        />
+      )}
     </div>
   );
 };
