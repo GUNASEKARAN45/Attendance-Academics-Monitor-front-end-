@@ -60,7 +60,7 @@ export default function StudentLogin() {
       <div className={styles.loginCard}>
         <div className={styles.loginHeader}>
           <div className={styles.loginLogo}>
-            <div className={styles.logoText}>ACE</div>
+            <div className={styles.logoText}>A</div>
           </div>
           <h1 className={styles.loginTitle}>Student Login</h1>
           <p className={styles.loginSubtitle}>Access your student dashboard</p>
@@ -127,7 +127,7 @@ export default function StudentLogin() {
         {/* Footer */}
         <div className={styles.loginFooter}>
           <p className={styles.footerText}>
-            Adhiyamaan College of Engineering • Student Access Only
+            Attenitix • Student Access Only
           </p>
         </div>
       </div>

@@ -68,7 +68,7 @@ export default function StaffLogin() {
       <div className={styles.loginCard}>
         <div className={styles.loginHeader}>
           <div className={styles.loginLogo}>
-            <div className={styles.logoText}>ACE</div>
+            <div className={styles.logoText}>A</div>
           </div>
           <h1 className={styles.loginTitle}>Staff Login</h1>
           <p className={styles.loginSubtitle}>Access your staff dashboard</p>
@@ -135,7 +135,7 @@ export default function StaffLogin() {
         {/* Footer */}
         <div className={styles.loginFooter}>
           <p className={styles.footerText}>
-            Adhiyamaan College of Engineering • Staff Access Only
+            Attenitix • Staff Access Only
           </p>
         </div>
       </div>

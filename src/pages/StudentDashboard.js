@@ -7,21 +7,18 @@ const StudentDashboard = () => {
   const [timeFilter, setTimeFilter] = useState('day');
   const [showProfilePopup, setShowProfilePopup] = useState(false);
   const [notifications, setNotifications] = useState([]);
-  const [currentMonth, setCurrentMonth] = useState(new Date().getMonth()); // October (9) as of 2025-10-05
-  const [currentYear, setCurrentYear] = useState(new Date().getFullYear()); // 2025
+  const [currentMonth, setCurrentMonth] = useState(9); // October (0-indexed)
+  const [currentYear, setCurrentYear] = useState(2025);
   const [todos, setTodos] = useState([]);
   const [newTodo, setNewTodo] = useState('');
   const [editingId, setEditingId] = useState(null);
   const [editingText, setEditingText] = useState('');
   const [showTodoPopup, setShowTodoPopup] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [monthlyAttendance, setMonthlyAttendance] = useState({});
 
-  const [currentWeekStart, setCurrentWeekStart] = useState(() => {
-    const today = new Date(2025, 9, 5);
-    const dow = today.getDay();
-    const monday = new Date(today);
-    monday.setDate(today.getDate() - (dow === 0 ? 6 : dow - 1));
-    return monday;
-  });
+  // Use specified current date
+  const today = new Date(2025, 9, 11);
 
   // Mock student data
   const studentData = {
@@ -111,32 +108,6 @@ const StudentDashboard = () => {
     { id: 5, subject: 'Internet of Things', date: '2025-10-15', type: 'Semester', status: 'upcoming' }
   ];
 
-  // Mock schedule events: One subject per period for each day
-  const subjects = [
-    'Web Development',
-    'Data Structures',
-    'Operating Systems',
-    'Software Engineering',
-    'Internet of Things',
-    'Sensors & Actuators',
-    'Database Systems'
-  ];
-  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const scheduleEvents = [];
-  days.forEach(day => {
-    for (let period = 1; period <= 7; period++) {
-      scheduleEvents.push({
-        id: `${day}-${period}`,
-        subject: subjects[(period - 1) % subjects.length], // Cycle through subjects
-        startPeriod: period,
-        span: 1, // Each event spans one period
-        day: day,
-        // color: ['#ef4444', '#f97316', '#22c55e', '#3b82f6', '#8b5cf6', '#ec4899', '#10b981'][(period - 1) % 7],
-        isPresent: Math.random() > 0.3 // Randomly assign present/absent for demo
-      });
-    }
-  });
-
   useEffect(() => {
     document.title = "Attenitix - Student Dashboard";
   }, []);
@@ -144,14 +115,6 @@ const StudentDashboard = () => {
   useEffect(() => {
     setNotifications(mockNotifications);
   }, []);
-
-  useEffect(() => {
-    const firstDay = new Date(currentYear, currentMonth, 1);
-    const dow = firstDay.getDay();
-    const monday = new Date(firstDay);
-    monday.setDate(firstDay.getDate() - (dow === 0 ? 6 : dow - 1));
-    setCurrentWeekStart(monday);
-  }, [currentMonth, currentYear]);
 
   const deleteNotification = (id) => {
     setNotifications(notifications.filter(notification => notification.id !== id));
@@ -166,28 +129,49 @@ const StudentDashboard = () => {
   const unreadCount = notifications.filter(n => !n.read).length;
 
   const generateCalendarData = () => {
-    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    const currentDate = new Date(currentYear, currentMonth, 1);
-    const firstDay = currentDate.getDay();
-    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
     const calendar = [];
-    let day = 1;
+    const firstDayDate = new Date(currentYear, currentMonth, 1);
+    const firstDay = firstDayDate.getDay(); // 0 = Sunday
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
 
-    for (let i = 0; i < (daysInMonth + firstDay); i++) {
-      if (i >= firstDay) {
-        calendar.push({ day, present: Math.random() > 0.3 });
-        day++;
-      } else {
-        calendar.push({ day: null, present: null });
-      }
+    // Fill empty cells for days before the 1st
+    for (let i = 0; i < firstDay; i++) {
+      calendar.push(null);
     }
+
+    // Fill days of the month
+    for (let day = 1; day <= daysInMonth; day++) {
+      calendar.push(day);
+    }
+
+    // Fill remaining empty cells to complete the grid (up to 42 cells max, 6 weeks)
+    while (calendar.length % 7 !== 0) {
+      calendar.push(null);
+    }
+
     return calendar;
+  };
+
+  const generateMonthlyAttendance = () => {
+    const data = {};
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    for (let d = 1; d <= daysInMonth; d++) {
+      const date = new Date(currentYear, currentMonth, d);
+      const dateStr = date.toISOString().split('T')[0];
+      const dow = date.getDay();
+      if (dow === 0) continue; // Sunday off, no data
+      // Mock periods: 7 periods, mostly present
+      const periods = Array.from({ length: 7 }, () => Math.random() > 0.2);
+      data[dateStr] = { periods };
+    }
+    return data;
   };
 
   const [calendarData, setCalendarData] = useState(generateCalendarData());
 
   useEffect(() => {
     setCalendarData(generateCalendarData());
+    setMonthlyAttendance(generateMonthlyAttendance());
   }, [currentMonth, currentYear]);
 
   const prevMonth = () => {
@@ -208,24 +192,16 @@ const StudentDashboard = () => {
     }
   };
 
-  const prevWeek = () => {
-    const newStart = new Date(currentWeekStart);
-    newStart.setDate(newStart.getDate() - 7);
-    setCurrentWeekStart(newStart);
-    const mid = new Date(newStart);
-    mid.setDate(mid.getDate() + 3);
-    setCurrentMonth(mid.getMonth());
-    setCurrentYear(mid.getFullYear());
-  };
-
-  const nextWeek = () => {
-    const newStart = new Date(currentWeekStart);
-    newStart.setDate(newStart.getDate() + 7);
-    setCurrentWeekStart(newStart);
-    const mid = new Date(newStart);
-    mid.setDate(mid.getDate() + 3);
-    setCurrentMonth(mid.getMonth());
-    setCurrentYear(mid.getFullYear());
+  const canGoNext = () => {
+    let nextMonthVal = currentMonth + 1;
+    let nextYearVal = currentYear;
+    if (nextMonthVal > 11) {
+      nextMonthVal = 0;
+      nextYearVal += 1;
+    }
+    if (nextYearVal > today.getFullYear()) return false;
+    if (nextYearVal === today.getFullYear() && nextMonthVal > today.getMonth()) return false;
+    return true;
   };
 
   const prevSemester = () => setSelectedSemester(Math.max(1, selectedSemester - 1));
@@ -597,7 +573,7 @@ const StudentDashboard = () => {
           </div>
         </div>
         <div className={styles.chartContainer}>
-          <canvas ref={canvasRef} width={800} height={450} />
+          <canvas ref={canvasRef} width={800} height={350} />
           {tooltip.visible && (
             <div
               className={styles.tooltip}
@@ -633,13 +609,39 @@ const StudentDashboard = () => {
   );
 
   const ScheduleCalendar = () => {
-    const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    const periods = ['Period 1', 'Period 2', 'Period 3', 'Period 4', 'Period 5', 'Period 6', 'Period 7'];
-    const today = new Date(2025, 9, 5); // October 5, 2025
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+    const DayAttendancePopup = () => {
+      if (!selectedDate) return null;
+      const dateStr = selectedDate.toISOString().split('T')[0];
+      const attendance = monthlyAttendance[dateStr];
+      return (
+        <div className={styles.profilePopupOverlay} onClick={() => setSelectedDate(null)}>
+          <div className={styles.profilePopup} onClick={(e) => e.stopPropagation()}>
+            <h3>Attendance for {selectedDate.toLocaleDateString()}</h3>
+            {attendance ? (
+              <div className={styles.periodsContainer}>
+                {attendance.periods.map((present, index) => (
+                  <div key={index} className={styles.periodDot}>
+                    <div className={`${styles.dot} ${present ? styles.present : styles.absent}`}>
+                      {index + 1}
+                    </div>
+                    <span>P{index + 1}</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p>No classes or data available for this day.</p>
+            )}
+            <button className={styles.closeBtn} onClick={() => setSelectedDate(null)}>Close</button>
+          </div>
+        </div>
+      );
+    };
 
     return (
       <div className={styles.scheduleCalendar}>
-        <h3>Date & Period-wise Attendance Record</h3>
+        <h3>Attendance Calendar</h3>
         <div className={styles.calendarHeader}>
           <button className={styles.navBtn} onClick={prevMonth}>
             <span className={styles.navIcon}>&larr;</span>
@@ -647,66 +649,43 @@ const StudentDashboard = () => {
           <span className={styles.currentPeriod}>
             {new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long' })} {currentYear}
           </span>
-          <button className={styles.navBtn} onClick={nextMonth}>
-            <span className={styles.navIcon}>&rarr;</span>
-          </button>
-        </div>
-        <div className={styles.weekNav}>
-          <button className={styles.navBtn} onClick={prevWeek}>
-            <span className={styles.navIcon}>&larr;</span>
-          </button>
-          <span className={styles.currentPeriod}>
-            {currentWeekStart.toLocaleDateString('default', { month: 'short', day: 'numeric' })} - {(() => {
-              const end = new Date(currentWeekStart);
-              end.setDate(end.getDate() + 6);
-              return end.toLocaleDateString('default', { month: 'short', day: 'numeric' });
-            })()}
-          </span>
-          <button className={styles.navBtn} onClick={nextWeek}>
+          <button className={styles.navBtn} onClick={nextMonth} disabled={!canGoNext()}>
             <span className={styles.navIcon}>&rarr;</span>
           </button>
         </div>
         <div className={styles.calendarGrid}>
-          <div className={styles.timeColumn}>
-            <div className={styles.dayHeader}></div> {/* Empty corner */}
-            {periods.map((period, index) => (
-              <div key={index} className={styles.timeSlot}>{period}</div>
-            ))}
-          </div>
-          {dayNames.map((dayName, i) => {
-            const dayDate = new Date(currentWeekStart);
-            dayDate.setDate(dayDate.getDate() + i);
+          {dayNames.map((dayName) => (
+            <div key={dayName} className={styles.dayHeader}>
+              {dayName}
+            </div>
+          ))}
+          {calendarData.map((day, index) => {
+            if (day === null) {
+              return <div key={index} className={styles.emptyCell} />;
+            }
+            const dayDate = new Date(currentYear, currentMonth, day);
             const isToday = dayDate.toDateString() === today.toDateString();
+            const dateStr = dayDate.toISOString().split('T')[0];
+            const attendance = monthlyAttendance[dateStr];
+            let colorClass = '';
+            if (attendance) {
+              const presentCount = attendance.periods.filter((p) => p).length;
+              const percentage = (presentCount / 7) * 100;
+              colorClass = percentage >= 75 ? styles.present : percentage < 50 ? styles.absent : styles.partial;
+            }
             return (
-              <div key={i} className={`${styles.dayColumn} ${isToday ? styles.today : ''}`}>
-                <div className={styles.dayHeader}>
-                  {dayName}<br/>{dayDate.getDate()}
-                </div>
-                {periods.map((period, slotIndex) => (
-                  <div key={slotIndex} className={styles.timeSlot}>
-                    {scheduleEvents.filter(e => e.day === dayName && e.startPeriod === (slotIndex + 1)).map(event => (
-                      <div
-                        key={event.id}
-                        className={styles.event}
-                        data-present={event.isPresent}
-                        style={{
-                          height: `${event.span * 60}px`,
-                          top: '0px',
-                          backgroundColor: event.color,
-                          left: '2px',
-                          right: '2px',
-                        }}
-                      >
-                        <span className={styles.eventText}>{event.subject}</span>
-                        {/* <marquee behavior="scroll" direction="left" scrollamount="2">{event.subject}</marquee> */}
-                      </div>
-                    ))}
-                  </div>
-                ))}
+              <div
+                key={index}
+                className={`${styles.dayCell} ${isToday ? styles.today : ''} ${colorClass}`}
+                onClick={() => setSelectedDate(dayDate)}
+                style={{ fontSize: '0.8rem', padding: '0.5rem', minHeight: '2rem' }} // Reduced cell size
+              >
+                <span className={styles.dayNumber}>{day}</span>
               </div>
             );
           })}
         </div>
+        <DayAttendancePopup />
       </div>
     );
   };

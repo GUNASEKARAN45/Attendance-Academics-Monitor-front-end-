@@ -61,7 +61,7 @@ export default function AdminLogin() {
       <div className={styles.loginCard}>
         <div className={styles.loginHeader}>
           <div className={styles.loginLogo}>
-            <div className={styles.logoText}>ACE</div>
+            <div className={styles.logoText}>A</div>
           </div>
           <h1 className={styles.loginTitle}>Admin Login</h1>
           <p className={styles.loginSubtitle}>Access the administration dashboard</p>
@@ -122,7 +122,7 @@ export default function AdminLogin() {
         {/* Footer */}
         <div className={styles.loginFooter}>
           <p className={styles.footerText}>
-            Adhiyamaan College of Engineering • Administrative Access Only
+            Attenitix • Administrative Access Only
           </p>
         </div>
       </div>
