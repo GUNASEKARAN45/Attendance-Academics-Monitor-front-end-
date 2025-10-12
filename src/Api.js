@@ -1,10 +1,13 @@
 import axios from "axios";
 
-const API_BASE =  "https://attendance-academics-monitor-backend.onrender.com";
+const API_BASE =
+  process.env.NODE_ENV === "production"
+    ? "https://attendance-academics-monitor-backend.onrender.com"
+    : "http://localhost:5000";
 
 export const api = axios.create({
   baseURL: API_BASE,
-  headers: { "Content-Type": "application/json" }
+  headers: { "Content-Type": "application/json" },
 });
 
 export function setAuthToken(token) {

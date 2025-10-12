@@ -1099,3 +1099,89 @@ tr:hover {
     width: 250px;
   }
 }
+
+/* Add to existing AdminDashboard.module.css */
+.changePasswordForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-top: 1.2rem;
+  padding: 1rem;
+  background: #2d3748;
+  border-radius: 10px;
+  border: 1px solid #334155;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.changePasswordForm input {
+  padding: 0.7rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  background: #374151;
+  color: #f8fafc;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.changePasswordForm input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.changePasswordForm input::placeholder {
+  color: #94a3b8;
+}
+
+.changePasswordForm button {
+  padding: 0.7rem 1.2rem;
+  background: #3b82f6;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.changePasswordForm button:hover {
+  background: #2563eb;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.changePasswordForm .error {
+  color: #ef4444;
+  font-size: 0.85rem;
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+.changePasswordForm .success {
+  color: #10b981;
+  font-size: 0.85rem;
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+/* Responsive Design for Change Password Form */
+@media (max-width: 768px) {
+  .changePasswordForm {
+    padding: 0.8rem;
+  }
+
+  .changePasswordForm input {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.85rem;
+  }
+
+  .changePasswordForm button {
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .changePasswordForm .error,
+  .changePasswordForm .success {
+    font-size: 0.8rem;
+  }
+}
