@@ -77,7 +77,7 @@ const ProfilePopup = ({ setShowProfilePopup }) => {
     localStorage.removeItem('token');
     setAuthToken(null);
     console.log('Token removed, redirecting to /login/student_login');
-    navigate('/login/student_login');
+    navigate('/');
   };
 
   if (loading) {

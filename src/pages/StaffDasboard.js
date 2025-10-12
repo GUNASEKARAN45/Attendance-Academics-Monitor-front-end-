@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from '../styles/StaffDashboard.module.css';
 import ProfilePopup from '../components/Staffpage/ProfilePopup';
 import StudentPopup from '../components/Staffpage/StudentPopup';
@@ -11,8 +12,10 @@ import MarksTable from '../components/Staffpage/MarksTable';
 import AcademicInsights from '../components/Staffpage/AcademicInsights';
 import StudentInsights from '../components/Staffpage/StudentInsights';
 import TakeAttendance from '../components/Staffpage/TakeAttendance';
+import { api } from '../Api';
 
 const StaffDashboard = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('attendance');
   const [selectedYear, setSelectedYear] = useState('2024');
   const [selectedDepartment, setSelectedDepartment] = useState('ECE');
@@ -25,6 +28,9 @@ const StaffDashboard = () => {
   const [showStudentPopup, setShowStudentPopup] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [showEditAttendance, setShowEditAttendance] = useState(null);
+  const [staffData, setStaffData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [todayAttendanceData, setTodayAttendanceData] = useState([
     { regNo: "EC001", status: true },
     { regNo: "EC002", status: true },
@@ -58,14 +64,6 @@ const StaffDashboard = () => {
     { regNo: "EC030", status: false },
   ]);
 
-  // Mock staff data
-  const staffData = {
-    staffId: "STF001",
-    name: "Mrs. Suriya",
-    department: "ECE",
-    designation: "Assistant Professor"
-  };
-
   // Mock data for components
   const subjectStats = [
     { name: 'Web Development', percentage: 85 },
@@ -83,7 +81,7 @@ const StaffDashboard = () => {
         'Data Structures': [82, 90, 75, 92, 85, 68],
         'Database Systems': [88, 94, 80, 97, 90, 72],
         'Operating Systems': [80, 88, 73, 90, 83, 65],
-      }
+      },
     },
     monthly: {
       labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
@@ -92,8 +90,8 @@ const StaffDashboard = () => {
         'Data Structures': [80, 86, 83, 88],
         'Database Systems': [85, 90, 87, 92],
         'Operating Systems': [78, 84, 81, 86],
-      }
-    }
+      },
+    },
   };
 
   const studentsData = [
@@ -102,21 +100,21 @@ const StaffDashboard = () => {
       name: "Student A",
       marks: { ut1: 45, ut2: 42, ut3: 48, model1: 85, sem: 90 },
       attendancePercentage: 95,
-      insights: ["Behavior is good", "Consistent performance", "High marks in Web Development"]
+      insights: ["Behavior is good", "Consistent performance", "High marks in Web Development"],
     },
     {
       regNo: "AC22UEC002",
       name: "Student B",
       marks: { ut1: 38, ut2: 40, ut3: 42, model1: 78, sem: 83 },
       attendancePercentage: 85,
-      insights: ["Taking continuous leave on Saturday", "Less marks in Database Systems", "Needs improvement in consistency"]
+      insights: ["Taking continuous leave on Saturday", "Less marks in Database Systems", "Needs improvement in consistency"],
     },
     {
       regNo: "AC22UEC003",
       name: "Student C",
       marks: { ut1: 25, ut2: 22, ut3: 20, model1: 45, sem: 49 },
       attendancePercentage: 60,
-      insights: ["Low attendance", "Failing in multiple subjects", "Requires counseling"]
+      insights: ["Low attendance", "Failing in multiple subjects", "Requires counseling"],
     },
   ];
 
@@ -141,26 +139,50 @@ const StaffDashboard = () => {
     { id: 2, type: 'exam', message: 'Schedule exam for Data Structures', date: '2023-10-22', read: false },
     { id: 3, type: 'fail', message: 'Multiple failures in Database Systems', date: '2023-10-21', read: true },
     { id: 4, type: 'meeting', message: 'Department meeting tomorrow', date: '2023-10-20', read: false },
-    { id: 5, type: 'update', message: 'Update marks for Operating Systems', date: '2023-10-19', read: true }
+    { id: 5, type: 'update', message: 'Update marks for Operating Systems', date: '2023-10-19', read: true },
   ];
 
   useEffect(() => {
-    document.title = "Attenitix - Staff Dashboard - 10:04 PM IST, Oct 11, 2025";
-  }, []);
+    document.title = 'Attenitix - Staff Dashboard';
+    const fetchProfile = async () => {
+      try {
+        const response = await api.get('/api/user/profile');
+        setStaffData(response.data);
+        setLoading(false);
+      } catch (err) {
+        console.error('Profile fetch error:', err.response?.status, err.response?.data);
+        setError(
+          err.response?.status === 401
+            ? 'Session expired, please log in again'
+            : err.response?.status === 502
+            ? 'Server is down, please try again later'
+            : err.response?.status === 404
+            ? 'User profile not found'
+            : 'Failed to load profile data'
+        );
+        setLoading(false);
+        if (err.response?.status === 401) {
+          localStorage.removeItem('token');
+          navigate('/login/staff_login');
+        }
+      }
+    };
+    fetchProfile();
+  }, [navigate]);
 
   useEffect(() => {
     setNotifications(mockNotifications);
   }, []);
 
   const deleteNotification = (id) => {
-    setNotifications(notifications.filter(n => n.id !== id));
+    setNotifications(notifications.filter((n) => n.id !== id));
   };
 
   const markAsRead = (id) => {
-    setNotifications(notifications.map(n => n.id === id ? { ...n, read: true } : n));
+    setNotifications(notifications.map((n) => (n.id === id ? { ...n, read: true } : n)));
   };
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
   const canvasRef = useRef(null);
 
@@ -168,40 +190,73 @@ const StaffDashboard = () => {
     console.log('Chart drawing function - implement in component');
   };
 
+  if (loading) {
+    return (
+      <div className={styles.profilePopupOverlay}>
+        <div className={styles.profilePopup}>
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={styles.profilePopupOverlay}>
+        <div className={styles.profilePopup}>
+          <p>{error}</p>
+          <button className={styles.closeBtn} onClick={() => navigate('/login/staff_login')}>
+            Go to Login
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.staffDashboard}>
       <div className={styles.container}>
         <div className={styles.sidebar}>
           <div className={styles.profileSection} onClick={() => setShowProfilePopup(true)}>
-            <div className={styles.profileAvatar}>{staffData.name.charAt(0)}</div>
+            <div className={styles.profileAvatar}>{staffData?.name ? staffData.name.charAt(0) : 'U'}</div>
             <div className={styles.profileInfo}>
-              <h3>{staffData.name}</h3>
-              <p>{staffData.staffId}</p>
+              <h3>{staffData?.name || 'Unknown'}</h3>
+              <p>{staffData?.staffId || 'N/A'}</p>
             </div>
           </div>
           <div className={styles.navigationTabs}>
-            <button className={`${styles.tabBtn} ${activeTab === 'attendance' ? styles.active : ''}`} onClick={() => setActiveTab('attendance')}>
+            <button
+              className={`${styles.tabBtn} ${activeTab === 'attendance' ? styles.active : ''}`}
+              onClick={() => setActiveTab('attendance')}
+            >
               <i className="fas fa-chart-bar"></i> Attendance Details
             </button>
-            <button className={`${styles.tabBtn} ${activeTab === 'takeAttendance' ? styles.active : ''}`} onClick={() => setActiveTab('takeAttendance')}>
+            <button
+              className={`${styles.tabBtn} ${activeTab === 'takeAttendance' ? styles.active : ''}`}
+              onClick={() => setActiveTab('takeAttendance')}
+            >
               <i className="fas fa-check"></i> Take Attendance
             </button>
-            <button className={`${styles.tabBtn} ${activeTab === 'marks' ? styles.active : ''}`} onClick={() => setActiveTab('marks')}>
+            <button
+              className={`${styles.tabBtn} ${activeTab === 'marks' ? styles.active : ''}`}
+              onClick={() => setActiveTab('marks')}
+            >
               <i className="fas fa-book"></i> Marks Entry
             </button>
-            <button className={`${styles.tabBtn} ${activeTab === 'academicInsights' ? styles.active : ''}`} onClick={() => setActiveTab('academicInsights')}>
+            <button
+              className={`${styles.tabBtn} ${activeTab === 'academicInsights' ? styles.active : ''}`}
+              onClick={() => setActiveTab('academicInsights')}
+            >
               <i className="fas fa-chart-pie"></i> Academic Insights
             </button>
-            <button className={`${styles.tabBtn} ${activeTab === 'studentInsights' ? styles.active : ''}`} onClick={() => setActiveTab('studentInsights')}>
+            <button
+              className={`${styles.tabBtn} ${activeTab === 'studentInsights' ? styles.active : ''}`}
+              onClick={() => setActiveTab('studentInsights')}
+            >
               <i className="fas fa-users"></i> Student Insights
             </button>
           </div>
-          <Notifications 
-            notifications={notifications}
-            unreadCount={unreadCount}
-            onDelete={deleteNotification}
-            onMarkAsRead={markAsRead}
-          />
+          <Notifications notifications={notifications} unreadCount={unreadCount} onDelete={deleteNotification} onMarkAsRead={markAsRead} />
         </div>
         <div className={styles.content}>
           <h2>{activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Dashboard</h2>
@@ -210,7 +265,11 @@ const StaffDashboard = () => {
             <div className={styles.filters}>
               <div className={styles.filterGroup}>
                 <label>Year:</label>
-                <select value={selectedYear} onChange={(e) => setSelectedYear(e.target.value)} className={styles.filterSelect}>
+                <select
+                  value={selectedYear}
+                  onChange={(e) => setSelectedYear(e.target.value)}
+                  className={styles.filterSelect}
+                >
                   <option>1</option>
                   <option>2</option>
                   <option>3</option>
@@ -219,7 +278,11 @@ const StaffDashboard = () => {
               </div>
               <div className={styles.filterGroup}>
                 <label>Department:</label>
-                <select value={selectedDepartment} onChange={(e) => setSelectedDepartment(e.target.value)} className={styles.filterSelect}>
+                <select
+                  value={selectedDepartment}
+                  onChange={(e) => setSelectedDepartment(e.target.value)}
+                  className={styles.filterSelect}
+                >
                   <option>ECE</option>
                   <option>CSE</option>
                   <option>MECH</option>
@@ -227,7 +290,11 @@ const StaffDashboard = () => {
               </div>
               <div className={styles.filterGroup}>
                 <label>Section:</label>
-                <select value={selectedSection} onChange={(e) => setSelectedSection(e.target.value)} className={styles.filterSelect}>
+                <select
+                  value={selectedSection}
+                  onChange={(e) => setSelectedSection(e.target.value)}
+                  className={styles.filterSelect}
+                >
                   <option>A</option>
                   <option>B</option>
                   <option>C</option>
@@ -235,7 +302,11 @@ const StaffDashboard = () => {
               </div>
               <div className={styles.filterGroup}>
                 <label>Subject:</label>
-                <select value={selectedSubject} onChange={(e) => setSelectedSubject(e.target.value)} className={styles.filterSelect}>
+                <select
+                  value={selectedSubject}
+                  onChange={(e) => setSelectedSubject(e.target.value)}
+                  className={styles.filterSelect}
+                >
                   <option>Web Development</option>
                   <option>Data Structures</option>
                   <option>Database Systems</option>
@@ -247,12 +318,9 @@ const StaffDashboard = () => {
 
           {activeTab === 'attendance' && (
             <>
-              <TodayAttendance 
-                todayAttendanceData={todayAttendanceData}
-                setShowEditAttendance={setShowEditAttendance}
-              />
+              <TodayAttendance todayAttendanceData={todayAttendanceData} setShowEditAttendance={setShowEditAttendance} />
               <SubjectWisePercentage subjectStats={subjectStats} />
-              <CombinedAttendanceChart 
+              <CombinedAttendanceChart
                 timeFilter={timeFilter}
                 setTimeFilter={setTimeFilter}
                 currentWeek={currentWeek}
@@ -265,45 +333,21 @@ const StaffDashboard = () => {
               />
             </>
           )}
-          {activeTab === 'marks' && (
-            <MarksTable 
-              selectedSubject={selectedSubject}
-              studentsData={studentsData}
-            />
-          )}
-          {activeTab === 'academicInsights' && (
-            <AcademicInsights 
-              attendanceInsights={attendanceInsights}
-              marksInsights={marksInsights}
-            />
-          )}
+          {activeTab === 'marks' && <MarksTable selectedSubject={selectedSubject} studentsData={studentsData} />}
+          {activeTab === 'academicInsights' && <AcademicInsights attendanceInsights={attendanceInsights} marksInsights={marksInsights} />}
           {activeTab === 'studentInsights' && (
-            <StudentInsights 
-              selectedSubject={selectedSubject}
-              studentsData={studentsData}
-              setSelectedStudent={setSelectedStudent}
-              setShowStudentPopup={setShowStudentPopup}
-            />
+            <StudentInsights selectedSubject={selectedSubject} studentsData={studentsData} setSelectedStudent={setSelectedStudent} setShowStudentPopup={setShowStudentPopup} />
           )}
           {activeTab === 'takeAttendance' && (
-            <TakeAttendance 
-              selectedDepartment={selectedDepartment}
-              selectedYear={selectedYear}
-              selectedSection={selectedSection}
-              selectedSubject={selectedSubject}
-            />
+            <TakeAttendance selectedDepartment={selectedDepartment} selectedYear={selectedYear} selectedSection={selectedSection} selectedSubject={selectedSubject} />
           )}
         </div>
       </div>
 
-      {showProfilePopup && <ProfilePopup setShowProfilePopup={setShowProfilePopup} staffData={staffData} />}
+      {showProfilePopup && <ProfilePopup setShowProfilePopup={setShowProfilePopup} />}
       {showStudentPopup && selectedStudent && <StudentPopup selectedStudent={selectedStudent} onClose={() => { setShowStudentPopup(false); setSelectedStudent(null); }} />}
       {showEditAttendance && (
-        <EditAttendancePopup 
-          student={showEditAttendance}
-          onClose={() => setShowEditAttendance(null)}
-          setTodayAttendanceData={setTodayAttendanceData}
-        />
+        <EditAttendancePopup student={showEditAttendance} onClose={() => setShowEditAttendance(null)} setTodayAttendanceData={setTodayAttendanceData} />
       )}
     </div>
   );
