@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from '../styles/StudentDashboard.module.css';
 import AttendanceChart from '../components/Studentpage/AttendanceChart';
 import ExamSchedule from '../components/Studentpage/ExamSchedule';
@@ -9,8 +10,10 @@ import ProfilePopup from '../components/Studentpage/ProfilePopup';
 import ScheduleCalendar from '../components/Studentpage/ScheduleCalendar';
 import SubjectPerformance from '../components/Studentpage/SubjectPerformance';
 import TodayAttendance from '../components/Studentpage/TodayAttendance';
+import { api } from '../Api';
 
 const StudentDashboard = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('attendance');
   const [selectedSemester, setSelectedSemester] = useState(7);
   const [showProfilePopup, setShowProfilePopup] = useState(false);
@@ -23,23 +26,40 @@ const StudentDashboard = () => {
   const [editingText, setEditingText] = useState('');
   const [selectedDate, setSelectedDate] = useState(null);
   const [monthlyAttendance, setMonthlyAttendance] = useState({});
-  const [calendarData, setCalendarData] = useState([]); // Added missing state
+  const [calendarData, setCalendarData] = useState([]);
+  const [studentData, setStudentData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const today = new Date(2025, 9, 11);
 
-  const studentData = {
-    name: "Gunasekaran K",
-    regNumber: "6176AC22UEC036",
-    class: "B.E",
-    department: "ECE",
-    year: "4",
-    section: "A",
-    semester: 7
-  };
-
   useEffect(() => {
-    document.title = "Attenitix - Student Dashboard";
-  }, []);
+    document.title = 'Attenitix - Student Dashboard';
+    const fetchProfile = async () => {
+      try {
+        const response = await api.get('/api/user/profile');
+        setStudentData(response.data);
+        setLoading(false);
+      } catch (err) {
+        console.error('Profile fetch error:', err.response?.status, err.response?.data);
+        setError(
+          err.response?.status === 401
+            ? 'Session expired, please log in again'
+            : err.response?.status === 502
+            ? 'Server is down, please try again later'
+            : err.response?.status === 404
+            ? 'User profile not found'
+            : 'Failed to load profile data'
+        );
+        setLoading(false);
+        if (err.response?.status === 401) {
+          localStorage.removeItem('token');
+          navigate('/login/student_login');
+        }
+      }
+    };
+    fetchProfile();
+  }, [navigate]);
 
   useEffect(() => {
     setNotifications([
@@ -47,7 +67,7 @@ const StudentDashboard = () => {
       { id: 2, type: 'low-attendance', message: 'Your attendance in Data Structures is below 75%', date: '2025-10-03', read: false },
       { id: 3, type: 'exam', message: 'Web Development exam is tomorrow', date: '2025-10-06', read: true },
       { id: 4, type: 'fail', message: 'You failed in Database Systems', date: '2025-10-02', read: false },
-      { id: 5, type: 'absent', message: 'You were marked absent in Operating Systems on Friday', date: '2025-10-01', read: true }
+      { id: 5, type: 'absent', message: 'You were marked absent in Operating Systems on Friday', date: '2025-10-01', read: true },
     ]);
   }, []);
 
@@ -92,9 +112,7 @@ const StudentDashboard = () => {
   };
 
   const toggleComplete = (id) => {
-    setTodos(todos.map(todo => 
-      todo.id === id ? { ...todo, completed: !todo.completed } : todo
-    ));
+    setTodos(todos.map((todo) => (todo.id === id ? { ...todo, completed: !todo.completed } : todo)));
   };
 
   const startEdit = (id, text) => {
@@ -103,25 +121,21 @@ const StudentDashboard = () => {
   };
 
   const saveEdit = () => {
-    setTodos(todos.map(todo => 
-      todo.id === editingId ? { ...todo, text: editingText } : todo
-    ));
+    setTodos(todos.map((todo) => (todo.id === editingId ? { ...todo, text: editingText } : todo)));
     setEditingId(null);
     setEditingText('');
   };
 
   const deleteTodo = (id) => {
-    setTodos(todos.filter(todo => todo.id !== id));
+    setTodos(todos.filter((todo) => todo.id !== id));
   };
 
   const deleteNotification = (id) => {
-    setNotifications(notifications.filter(notification => notification.id !== id));
+    setNotifications(notifications.filter((notification) => notification.id !== id));
   };
 
   const markAsRead = (id) => {
-    setNotifications(notifications.map(notification => 
-      notification.id === id ? { ...notification, read: true } : notification
-    ));
+    setNotifications(notifications.map((notification) => (notification.id === id ? { ...notification, read: true } : notification)));
   };
 
   const generateCalendarData = () => {
@@ -164,37 +178,55 @@ const StudentDashboard = () => {
     setMonthlyAttendance(generateMonthlyAttendance());
   }, [currentMonth, currentYear]);
 
+  if (loading) {
+    return (
+      <div className={styles.profilePopupOverlay}>
+        <div className={styles.profilePopup}>
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={styles.profilePopupOverlay}>
+        <div className={styles.profilePopup}>
+          <p>{error}</p>
+          <button className={styles.closeBtn} onClick={() => navigate('/login/student_login')}>
+            Go to Login
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.studentDashboard}>
       <div className={styles.container}>
         <div className={styles.sidebar}>
-          <div 
-            className={styles.profileSection}
-            onClick={() => setShowProfilePopup(true)}
-          >
-            <div className={styles.profileAvatar}>
-              {studentData.name.charAt(0)}
-            </div>
+          <div className={styles.profileSection} onClick={() => setShowProfilePopup(true)}>
+            <div className={styles.profileAvatar}>{studentData.name ? studentData.name.charAt(0) : 'U'}</div>
             <div className={styles.profileInfo}>
-              <h3>{studentData.name}</h3>
-              <p>{studentData.regNumber}</p>
+              <h3>{studentData.name || 'Unknown'}</h3>
+              <p>{studentData.studentReg || 'N/A'}</p>
             </div>
           </div>
 
           <div className={styles.navigationTabs}>
-            <button 
+            <button
               className={`${styles.tabBtn} ${activeTab === 'attendance' ? styles.active : ''}`}
               onClick={() => setActiveTab('attendance')}
             >
               <span className={styles.tabIcon}>&#128202;</span> Attendance Details
             </button>
-            <button 
+            <button
               className={`${styles.tabBtn} ${activeTab === 'academic' ? styles.active : ''}`}
               onClick={() => setActiveTab('academic')}
             >
               <span className={styles.tabIcon}>&#128214;</span> Academic Details
             </button>
-            <button 
+            <button
               className={`${styles.tabBtn} ${activeTab === 'exam' ? styles.active : ''}`}
               onClick={() => setActiveTab('exam')}
             >
@@ -213,12 +245,12 @@ const StudentDashboard = () => {
                 <div className={styles.filters}>
                   <div className={styles.semesterFilter}>
                     <label>Semester:</label>
-                    <select 
-                      value={selectedSemester} 
+                    <select
+                      value={selectedSemester}
                       onChange={(e) => setSelectedSemester(parseInt(e.target.value))}
                       className={styles.filterSelect}
                     >
-                      {[1, 2, 3, 4, 5, 6, 7, 8].map(sem => (
+                      {[1, 2, 3, 4, 5, 6, 7, 8].map((sem) => (
                         <option key={sem} value={sem}>Semester {sem}</option>
                       ))}
                     </select>
