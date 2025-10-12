@@ -1,11 +1,11 @@
-import React, { useState, useEffect, memo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import styles from '../../styles/AdminDashboard.module.css';
+import styles from '../../styles/StaffDashboard.module.css';
 import { api, setAuthToken } from '../../Api';
 
-const ProfilePopup = memo(({ setShowProfilePopup }) => {
+const ProfilePopup = ({ setShowProfilePopup }) => {
   const navigate = useNavigate();
-  const [adminData, setAdminData] = useState(null);
+  const [staffData, setStaffData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showChangePasswordPopup, setShowChangePasswordPopup] = useState(false);
@@ -16,14 +16,11 @@ const ProfilePopup = memo(({ setShowProfilePopup }) => {
   const [passwordSuccess, setPasswordSuccess] = useState(null);
 
   useEffect(() => {
-    console.log('Token in ProfilePopup:', localStorage.getItem('token'));
+    console.log('Token:', localStorage.getItem('token'));
     const fetchProfile = async () => {
       try {
-        const token = localStorage.getItem('token');
-        if (token) setAuthToken(token);
         const response = await api.get('/api/user/profile');
-        console.log('Profile data fetched:', response.data);
-        setAdminData(response.data);
+        setStaffData(response.data);
         setLoading(false);
       } catch (err) {
         console.error('Profile fetch error:', err.response?.status, err.response?.data);
@@ -40,7 +37,7 @@ const ProfilePopup = memo(({ setShowProfilePopup }) => {
         if (err.response?.status === 401) {
           localStorage.removeItem('token');
           setAuthToken(null);
-          navigate('/login/admin_login');
+          navigate('/login/staff_login');
         }
       }
     };
@@ -80,8 +77,8 @@ const ProfilePopup = memo(({ setShowProfilePopup }) => {
     console.log('Logging out...');
     localStorage.removeItem('token');
     setAuthToken(null);
-    console.log('Token removed, redirecting to /login/admin_login');
-    navigate('/login/admin_login');
+    console.log('Token removed, redirecting to /login/staff_login');
+    navigate('/');
   };
 
   if (loading) {
@@ -112,11 +109,12 @@ const ProfilePopup = memo(({ setShowProfilePopup }) => {
       {/* Profile Popup */}
       <div className={styles.profilePopupOverlay}>
         <div className={styles.profilePopup}>
-          <h3>Admin Profile</h3>
+          <h3>Staff Profile</h3>
           <div className={styles.profileInfo}>
-            <p><strong>Name:</strong> {adminData?.name || 'Unknown'}</p>
-            <p><strong>Admin ID:</strong> {adminData?.adminId || 'N/A'}</p>
-            <p><strong>Designation:</strong> {adminData?.designation || 'N/A'}</p>
+            <p><strong>Name:</strong> {staffData.name || 'Unknown'}</p>
+            <p><strong>Staff ID:</strong> {staffData.staffId || 'N/A'}</p>
+            <p><strong>Department:</strong> {staffData.department || 'N/A'}</p>
+            <p><strong>Designation:</strong> {staffData.designation || 'N/A'}</p>
           </div>
           <div className={styles.profileActions}>
             <button
@@ -177,6 +175,6 @@ const ProfilePopup = memo(({ setShowProfilePopup }) => {
       )}
     </>
   );
-});
+};
 
 export default ProfilePopup;

@@ -524,8 +524,8 @@ const AdminDashboard = () => {
 
   if (loading) {
     return (
-      <div className={styles.loadingOverlay}>
-        <div className={styles.loadingSpinner}>
+      <div className={styles.profilePopupOverlay}>
+        <div className={styles.profilePopup}>
           <p>Loading...</p>
         </div>
       </div>
@@ -534,13 +534,10 @@ const AdminDashboard = () => {
 
   if (error) {
     return (
-      <div className={styles.errorOverlay}>
-        <div className={styles.errorContainer}>
+      <div className={styles.profilePopupOverlay}>
+        <div className={styles.profilePopup}>
           <p>{error}</p>
-          <button className={styles.retryBtn} onClick={() => window.location.reload()}>
-            Retry
-          </button>
-          <button className={styles.loginBtn} onClick={() => navigate('/login/admin_login')}>
+          <button className={styles.closeBtn} onClick={() => navigate('/login/admin_login')}>
             Go to Login
           </button>
         </div>
@@ -553,10 +550,10 @@ const AdminDashboard = () => {
       <div className={styles.container}>
         <div className={styles.sidebar}>
           <div className={styles.profileSection} onClick={() => setShowProfilePopup(true)}>
-            <div className={styles.profileAvatar}>{adminData?.name ? adminData.name.charAt(0) : 'A'}</div>
+            <div className={styles.profileAvatar}>{adminData?.name ? adminData.name.charAt(0) : 'U'}</div>
             <div className={styles.profileInfo}>
-              <h3>{adminData?.name || 'Administrator'}</h3>
-              <p>{adminData?.adminId || 'ADM001'}</p>
+              <h3>{adminData?.name || 'Unknown'}</h3>
+              <p>{adminData?.adminId || 'N/A'}</p>
             </div>
           </div>
 
