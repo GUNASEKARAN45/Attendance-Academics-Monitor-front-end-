@@ -1,7 +1,6 @@
-// Updated profilepopup.js
 import React, { useState, useEffect } from 'react';
 import styles from '../../styles/StudentDashboard.module.css';
-import { api,setAuthToken } from '../../Api'; // Adjust path if needed
+import { api, setAuthToken } from '../../api/api';
 
 const ProfilePopup = ({ setShowProfilePopup }) => {
   const [studentData, setStudentData] = useState(null);
@@ -15,13 +14,23 @@ const ProfilePopup = ({ setShowProfilePopup }) => {
   const [passwordSuccess, setPasswordSuccess] = useState(null);
 
   useEffect(() => {
+    console.log('Token:', localStorage.getItem('token'));
     const fetchProfile = async () => {
       try {
         const response = await api.get('/api/user/profile');
         setStudentData(response.data);
         setLoading(false);
       } catch (err) {
-        setError('Failed to load profile data');
+        console.error('Profile fetch error:', err.response?.status, err.response?.data);
+        setError(
+          err.response?.status === 401
+            ? 'Session expired, please log in again'
+            : err.response?.status === 502
+            ? 'Server is down, please try again later'
+            : err.response?.status === 404
+            ? 'User profile not found'
+            : 'Failed to load profile data'
+        );
         setLoading(false);
       }
     };
@@ -45,7 +54,7 @@ const ProfilePopup = ({ setShowProfilePopup }) => {
     try {
       const response = await api.post('/api/user/change-password', {
         currentPassword,
-        newPassword
+        newPassword,
       });
       setPasswordSuccess(response.data.message);
       setCurrentPassword('');
@@ -58,9 +67,9 @@ const ProfilePopup = ({ setShowProfilePopup }) => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token'); // Assuming token is stored in localStorage
-    setAuthToken(null); // From api.js
-    window.location.href = '/login'; // Redirect to login page (adjust path as needed)
+    localStorage.removeItem('token');
+    setAuthToken(null);
+    window.location.href = '/login';
   };
 
   if (loading) {
@@ -78,7 +87,9 @@ const ProfilePopup = ({ setShowProfilePopup }) => {
       <div className={styles.profilePopupOverlay}>
         <div className={styles.profilePopup}>
           <p>{error}</p>
-          <button className={styles.closeBtn} onClick={() => setShowProfilePopup(false)}>Close</button>
+          <button className={styles.closeBtn} onClick={() => setShowProfilePopup(false)}>
+            Close
+          </button>
         </div>
       </div>
     );
@@ -95,39 +106,39 @@ const ProfilePopup = ({ setShowProfilePopup }) => {
           <p><strong>Department:</strong> {studentData.department}</p>
           <p><strong>Year:</strong> {studentData.year}</p>
           <p><strong>Section:</strong> {studentData.section}</p>
-          <p><strong>DOB:</strong> {new Date(studentData.dob).toLocaleDateString()}</p>
-          <p><strong>Email:</strong> {studentData.email}</p>
-          <p><strong>Phone:</strong> {studentData.phone}</p>
+        
         </div>
         <div className={styles.profileActions}>
-          <button 
-            className={styles.changePasswordBtn} 
+          <button
+            className={styles.changePasswordBtn}
             onClick={() => setShowChangePassword(!showChangePassword)}
           >
             Change Password
           </button>
-          <button className={styles.logoutBtn} onClick={handleLogout}>Logout</button>
+          <button className={styles.logoutBtn} onClick={handleLogout}>
+            Logout
+          </button>
         </div>
 
         {showChangePassword && (
           <form onSubmit={handleChangePassword} className={styles.changePasswordForm}>
-            <input 
-              type="password" 
-              placeholder="Current Password" 
+            <input
+              type="password"
+              placeholder="Current Password"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
               required
             />
-            <input 
-              type="password" 
-              placeholder="New Password" 
+            <input
+              type="password"
+              placeholder="New Password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               required
             />
-            <input 
-              type="password" 
-              placeholder="Confirm New Password" 
+            <input
+              type="password"
+              placeholder="Confirm New Password"
               value={confirmNewPassword}
               onChange={(e) => setConfirmNewPassword(e.target.value)}
               required
@@ -138,7 +149,9 @@ const ProfilePopup = ({ setShowProfilePopup }) => {
           </form>
         )}
 
-        <button className={styles.closeBtn} onClick={() => setShowProfilePopup(false)}>Close</button>
+        <button className={styles.closeBtn} onClick={() => setShowProfilePopup(false)}>
+          Close
+        </button>
       </div>
     </div>
   );
