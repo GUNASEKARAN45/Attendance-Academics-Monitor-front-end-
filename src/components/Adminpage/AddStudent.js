@@ -35,9 +35,6 @@ const AddStudent = memo(({
         <select className={styles.filterSelect} value={studentDegree} onChange={e => setStudentDegree(e.target.value)} required>
           <option value="">Select Degree</option>
           <option value="BE/BTech">BE/BTech</option>
-          <option value="ME/MTech">ME/MTech</option>
-          <option value="MCA">MCA</option>
-          <option value="MBA">MBA</option>
         </select>
       </div>
       <div>
