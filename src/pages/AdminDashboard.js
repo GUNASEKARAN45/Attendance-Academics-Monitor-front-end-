@@ -44,7 +44,7 @@ const AdminDashboard = () => {
   const [departmentOptions, setDepartmentOptions] = useState([]);
   const [allYears] = useState(['1', '2', '3', '4']);
   const [yearOptions, setYearOptions] = useState([]);
-  const [allSections] = useState(['A']);
+  const [allSections] = useState(['A','B','C']);
   const [allSubjects, setAllSubjects] = useState([]);
   const [users, setUsers] = useState([]);
 
@@ -231,17 +231,17 @@ const AdminDashboard = () => {
   useEffect(() => {
     const departmentMap = {
       'BE/BTech': ['ECE', 'CSE', 'IT'],
-      // 'ME/MTech': ['ECE', 'CSE', 'IT'],
-      // MCA: ['Computer Applications'],
-      // MBA: ['Business Administration'],
+      'ME/MTech': ['ECE', 'CSE', 'IT'],
+      MCA: ['Computer Applications'],
+      MBA: ['Business Administration'],
     };
     setDepartmentOptions(departmentMap[studentDegree] || []);
 
     const yearMap = {
       'BE/BTech': ['1', '2', '3', '4'],
-      // 'ME/MTech': ['1', '2'],
-      // MCA: ['1', '2', '3'],
-      // MBA: ['1', '2'],
+      'ME/MTech': ['1', '2'],
+      MCA: ['1', '2', '3'],
+      MBA: ['1', '2'],
     };
     setYearOptions(yearMap[studentDegree] || []);
   }, [studentDegree]);

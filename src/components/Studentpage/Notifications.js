@@ -4,11 +4,11 @@ import styles from '../../styles/StudentDashboard.module.css';
 
 const Notifications = () => {
   const mockNotifications = [
-    { id: 1, type: 'absent', message: 'You were marked absent in Web Development on Monday', date: '2025-10-04', read: false },
-    { id: 2, type: 'low-attendance', message: 'Your attendance in Data Structures is below 75%', date: '2025-10-03', read: false },
-    { id: 3, type: 'exam', message: 'Web Development exam is tomorrow', date: '2025-10-06', read: true },
-    { id: 4, type: 'fail', message: 'You failed in Database Systems', date: '2025-10-02', read: false },
-    { id: 5, type: 'absent', message: 'You were marked absent in Operating Systems on Friday', date: '2025-10-01', read: true }
+    { id: 1, type: 'absent', message: 'You were marked absent in Web Development on Monday', date: '2025-10-14', read: false },
+    { id: 2, type: 'low-attendance', message: 'Your attendance in Data Structures is below 75%', date: '2025-10-14', read: false },
+    { id: 3, type: 'exam', message: 'Web Development exam is tomorrow', date: '2025-10-13', read: true },
+    { id: 4, type: 'fail', message: 'You failed in Database Systems', date: '2025-10-12', read: false },
+    { id: 5, type: 'absent', message: 'You were marked absent in Operating Systems on Friday', date: '2025-10-11', read: true }
   ];
 
   const [notifications, setNotifications] = React.useState(mockNotifications);
