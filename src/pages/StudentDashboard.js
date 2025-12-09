@@ -218,19 +218,19 @@ const StudentDashboard = () => {
               className={`${styles.tabBtn} ${activeTab === 'attendance' ? styles.active : ''}`}
               onClick={() => setActiveTab('attendance')}
             >
-              <span className={styles.tabIcon}>&#128202;</span> Attendance Details
+               Attendance Details
             </button>
             <button
               className={`${styles.tabBtn} ${activeTab === 'academic' ? styles.active : ''}`}
               onClick={() => setActiveTab('academic')}
             >
-              <span className={styles.tabIcon}>&#128214;</span> Academic Details
+               Academic Details
             </button>
             <button
               className={`${styles.tabBtn} ${activeTab === 'exam' ? styles.active : ''}`}
               onClick={() => setActiveTab('exam')}
             >
-              <span className={styles.tabIcon}>&#128197;</span> Exam Schedule
+               Exam Schedule
             </button>
           </div>
 

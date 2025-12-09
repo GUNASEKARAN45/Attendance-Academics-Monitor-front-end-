@@ -2,10 +2,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from '../styles/StaffDashboard.module.css';
+
+// Components
 import ProfilePopup from '../components/Staffpage/ProfilePopup';
 import StudentPopup from '../components/Staffpage/StudentPopup';
 import EditAttendancePopup from '../components/Staffpage/EditAttendancePopup';
-import Notifications from '../components/Staffpage/Notifications'; // ← Shared floating bell
+import Notifications from '../components/Staffpage/Notifications';
 import TodayAttendance from '../components/Staffpage/TodayAttendance';
 import SubjectWisePercentage from '../components/Staffpage/SubjectWisePercentage';
 import CombinedAttendanceChart from '../components/Staffpage/CombinedAttendanceChart';
@@ -13,6 +15,8 @@ import MarksTable from '../components/Staffpage/MarksTable';
 import AcademicInsights from '../components/Staffpage/AcademicInsights';
 import StudentInsights from '../components/Staffpage/StudentInsights';
 import TakeAttendance from '../components/Staffpage/TakeAttendance';
+import ExamScheduler from '../components/Staffpage/ExamScheduler';
+
 import { api } from '../Api';
 
 const StaffDashboard = () => {
@@ -26,7 +30,7 @@ const StaffDashboard = () => {
   const [selectedSubject, setSelectedSubject] = useState('Web Development');
 
   const [showProfilePopup, setShowProfilePopup] = useState(false);
-  const [showNotifications, setShowNotifications] = useState(false); // ← For floating bell
+  const [showNotifications, setShowNotifications] = useState(false);
   const [showStudentPopup, setShowStudentPopup] = useState(false);
   const [showEditAttendance, setShowEditAttendance] = useState(null);
 
@@ -36,7 +40,6 @@ const StaffDashboard = () => {
   const [todayAttendanceData, setTodayAttendanceData] = useState([]);
   const [loadingStudents, setLoadingStudents] = useState(false);
 
-  // Notifications State
   const [notifications, setNotifications] = useState([
     { id: 1, type: 'low-attendance', message: 'Class attendance below 75% in Web Development', date: '2025-04-05', read: false },
     { id: 2, type: 'exam', message: 'UT2 scheduled for next week', date: '2025-04-04', read: false },
@@ -84,6 +87,56 @@ const StaffDashboard = () => {
     { message: 'Improvement needed in Model Exam' },
   ];
 
+  // REAL drawChart function for canvas
+  const drawChart = () => {
+    if (!canvasRef.current) return;
+
+    const ctx = canvasRef.current.getContext('2d');
+    if (!ctx) return;
+
+    // Clear canvas
+    ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+
+    const currentData = timeFilter === 'weekly'
+      ? combinedAttendanceData.weekly
+      : combinedAttendanceData.monthly;
+
+    const labels = currentData.labels;
+    const values = currentData.data[selectedSubject] || [];
+
+    const barWidth = 60;
+    const spacing = 30;
+    const startX = 80;
+    const maxHeight = 180;
+    const maxValue = Math.max(...values, 100);
+
+    values.forEach((value, i) => {
+      const height = (value / maxValue) * maxHeight;
+      const x = startX + i * (barWidth + spacing);
+      const y = canvasRef.current.height - height - 50;
+
+      // Bar
+      ctx.fillStyle = '#3498db';
+      ctx.fillRect(x, y, barWidth, height);
+
+      // Value label on top
+      ctx.fillStyle = '#000';
+      ctx.font = 'bold 14px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText(`${value}%`, x + barWidth / 2, y - 5);
+
+      // X-axis label
+      ctx.font = '12px Arial';
+      ctx.fillText(labels[i], x + barWidth / 2, canvasRef.current.height - 20);
+    });
+
+    // Title
+    ctx.fillStyle = '#2c3e50';
+    ctx.font = 'bold 18px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(`${selectedSubject} - ${timeFilter === 'weekly' ? 'Weekly' : 'Monthly'} Attendance`, canvasRef.current.width / 2, 30);
+  };
+
   // Fetch Staff Profile
   useEffect(() => {
     document.title = 'Attenitix - Staff Dashboard';
@@ -101,7 +154,7 @@ const StaffDashboard = () => {
     fetchProfile();
   }, [navigate]);
 
-  // Fetch Students for Attendance
+  // Fetch Students
   useEffect(() => {
     const fetchStudents = async () => {
       if (!selectedYear || !selectedDepartment || !selectedSection) return;
@@ -129,38 +182,39 @@ const StaffDashboard = () => {
     fetchStudents();
   }, [selectedYear, selectedDepartment, selectedSection]);
 
-  // Notification Handlers
+  // Notification handlers
   const unreadCount = notifications.filter(n => !n.read).length;
 
   const markAsRead = (id) => {
-    setNotifications(prev =>
-      prev.map(notif => notif.id === id ? { ...notif, read: true } : notif)
-    );
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
   };
 
   const deleteNotification = (id) => {
-    setNotifications(prev => prev.filter(notif => notif.id !== id));
+    setNotifications(prev => prev.filter(n => n.id !== id));
   };
 
-  // Close notification dropdown when clicking outside
-  // Add this useEffect inside StaffDashboard component
-useEffect(() => {
-  const closeNotifications = (e) => {
-    // Close only if click is outside the notification area
-    if (!e.target.closest(`.${styles.notificationsSection}`)) {
-      setShowNotifications(false);
-    }
-  };
+  // Close notifications on click outside
+  useEffect(() => {
+    const close = (e) => {
+      if (!e.target.closest(`.${styles.notificationsSection}`)) {
+        setShowNotifications(false);
+      }
+    };
+    if (showNotifications) document.addEventListener('click', close);
+    return () => document.removeEventListener('click', close);
+  }, [showNotifications]);
 
-  if (showNotifications) {
-    document.addEventListener('click', closeNotifications);
-  }
+  if (loading) return (
+    <div className={styles.profilePopupOverlay}>
+      <div className={styles.profilePopup}><p>Loading...</p></div>
+    </div>
+  );
 
-  return () => document.removeEventListener('click', closeNotifications);
-}, [showNotifications]);
-
-  if (loading) return <div className={styles.profilePopupOverlay}><div className={styles.profilePopup}><p>Loading...</p></div></div>;
-  if (error) return <div className={styles.profilePopupOverlay}><div className={styles.profilePopup}><p>{error}</p></div></div>;
+  if (error) return (
+    <div className={styles.profilePopupOverlay}>
+      <div className={styles.profilePopup}><p>{error}</p></div>
+    </div>
+  );
 
   return (
     <div className={styles.staffDashboard}>
@@ -182,6 +236,7 @@ useEffect(() => {
               { key: 'marks', label: 'Marks Entry' },
               { key: 'academicInsights', label: 'Academic Insights' },
               { key: 'studentInsights', label: 'Student Insights' },
+              { key: 'examScheduler', label: 'Exam Scheduler' },
             ].map(tab => (
               <button
                 key={tab.key}
@@ -196,7 +251,6 @@ useEffect(() => {
 
         {/* Main Content */}
         <div className={styles.content}>
-          {/* Floating Notification Bell - Same as Admin */}
           <Notifications
             notifications={notifications}
             showNotifications={showNotifications}
@@ -212,37 +266,42 @@ useEffect(() => {
             {activeTab === 'marks' && 'Marks Entry'}
             {activeTab === 'academicInsights' && 'Academic Insights'}
             {activeTab === 'studentInsights' && 'Student Insights'}
+            {activeTab === 'examScheduler' && 'Exam Timetable Scheduler'}
           </h2>
           <br />
 
+          {/* Filters */}
           <div className={styles.contentHeader}>
             <div className={styles.filters}>
               <div className={styles.filterGroup}>
                 <label>Year:</label>
                 <select value={selectedYear} onChange={e => setSelectedYear(e.target.value)} className={styles.filterSelect}>
-                  {[1, 2, 3, 4].map(y => <option key={y} value={y}>{y}</option>)}
+                  {[1,2,3,4].map(y => <option key={y} value={y}>{y} Year</option>)}
                 </select>
               </div>
               <div className={styles.filterGroup}>
                 <label>Department:</label>
                 <select value={selectedDepartment} onChange={e => setSelectedDepartment(e.target.value)} className={styles.filterSelect}>
-                  {['ECE', 'CSE', 'IT', 'EEE'].map(d => <option key={d} value={d}>{d}</option>)}
+                  {['ECE','CSE','IT','EEE'].map(d => <option key={d} value={d}>{d}</option>)}
                 </select>
               </div>
               <div className={styles.filterGroup}>
                 <label>Section:</label>
                 <select value={selectedSection} onChange={e => setSelectedSection(e.target.value)} className={styles.filterSelect}>
-                  {['A', 'B', 'C'].map(s => <option key={s} value={s}>{s}</option>)}
+                  {['A','B','C'].map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
               </div>
-              <div className={styles.filterGroup}>
-                <label>Subject:</label>
-                <select value={selectedSubject} onChange={e => setSelectedSubject(e.target.value)} className={styles.filterSelect}>
-                  {['Web Development', 'Data Structures', 'Database Systems', 'Operating Systems'].map(sub => (
-                    <option key={sub} value={sub}>{sub}</option>
-                  ))}
-                </select>
-              </div>
+
+              {activeTab !== 'examScheduler' && (
+                <div className={styles.filterGroup}>
+                  <label>Subject:</label>
+                  <select value={selectedSubject} onChange={e => setSelectedSubject(e.target.value)} className={styles.filterSelect}>
+                    {['Web Development','Data Structures','Database Systems','Operating Systems'].map(s => (
+                      <option key={s} value={s}>{s}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
             </div>
           </div>
 
@@ -255,6 +314,8 @@ useEffect(() => {
                 loadingStudents={loadingStudents}
               />
               <SubjectWisePercentage subjectStats={subjectStats} />
+              
+              {/* FIXED: Now passes a real working drawChart function */}
               <CombinedAttendanceChart
                 timeFilter={timeFilter}
                 setTimeFilter={setTimeFilter}
@@ -263,10 +324,19 @@ useEffect(() => {
                 selectedSubject={selectedSubject}
                 combinedAttendanceData={combinedAttendanceData}
                 canvasRef={canvasRef}
-                drawChart={() => console.log('Drawing chart...')}
+                drawChart={drawChart}  
                 activeTab={activeTab}
               />
             </>
+          )}
+
+          {activeTab === 'takeAttendance' && (
+            <TakeAttendance
+              selectedYear={selectedYear}
+              selectedDepartment={selectedDepartment}
+              selectedSection={selectedSection}
+              selectedSubject={selectedSubject}
+            />
           )}
 
           {activeTab === 'marks' && (
@@ -278,24 +348,30 @@ useEffect(() => {
             />
           )}
 
-          {activeTab === 'academicInsights' && <AcademicInsights attendanceInsights={attendanceInsights} marksInsights={marksInsights} />}
+          {activeTab === 'academicInsights' && (
+            <AcademicInsights
+              attendanceInsights={attendanceInsights}
+              marksInsights={marksInsights}
+            />
+          )}
+
           {activeTab === 'studentInsights' && (
-  <StudentInsights
-    selectedSubject={selectedSubject}
-    studentsData={todayAttendanceData}
-    selectedYear={selectedYear}
-    selectedDepartment={selectedDepartment}
-    selectedSection={selectedSection}
-    setSelectedStudent={setSelectedStudent}
-    setShowStudentPopup={setShowStudentPopup}
-  />
-)}
-          {activeTab === 'takeAttendance' && (
-            <TakeAttendance
+            <StudentInsights
+              selectedSubject={selectedSubject}
+              studentsData={todayAttendanceData}
               selectedYear={selectedYear}
               selectedDepartment={selectedDepartment}
               selectedSection={selectedSection}
-              selectedSubject={selectedSubject}
+              setSelectedStudent={setSelectedStudent}
+              setShowStudentPopup={setShowStudentPopup}
+            />
+          )}
+
+          {activeTab === 'examScheduler' && (
+            <ExamScheduler
+              selectedYear={selectedYear}
+              selectedDepartment={selectedDepartment}
+              selectedSection={selectedSection}
             />
           )}
         </div>
@@ -303,16 +379,18 @@ useEffect(() => {
 
       {/* Popups */}
       {showProfilePopup && <ProfilePopup setShowProfilePopup={setShowProfilePopup} />}
+
       {showStudentPopup && selectedStudent && (
-  <StudentPopup
-    selectedStudent={selectedStudent}
-    selectedSubject={selectedSubject}
-    onClose={() => {
-      setShowStudentPopup(false);
-      setSelectedStudent(null);
-    }}
-  />
-)}
+        <StudentPopup
+          selectedStudent={selectedStudent}
+          selectedSubject={selectedSubject}
+          onClose={() => {
+            setShowStudentPopup(false);
+            setSelectedStudent(null);
+          }}
+        />
+      )}
+
       {showEditAttendance && (
         <EditAttendancePopup
           student={showEditAttendance}

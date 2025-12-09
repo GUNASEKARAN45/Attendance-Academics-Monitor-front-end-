@@ -16,6 +16,7 @@ import MarksTable from '../components/Adminpage/MarksTable';
 import AcademicInsights from '../components/Adminpage/AcademicInsights';
 import StudentsList from '../components/Adminpage/StudentsList';
 import AllUsers from '../components/Adminpage/AllUsers';
+import TimetableScheduler from '../components/Adminpage/TimetableScheduler';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -520,6 +521,12 @@ useEffect(() => {
             <button className={`${styles.tabBtn} ${activeTab === 'sendNotification' ? styles.active : ''}`} onClick={() => setActiveTab('sendNotification')}>
               Send Notification
             </button>
+            <button 
+  className={`${styles.tabBtn} ${activeTab === 'timetable' ? styles.active : ''}`} 
+  onClick={() => setActiveTab('timetable')}
+>
+  Timetable Scheduler
+</button>
           </div>
         </div>
 
@@ -671,6 +678,13 @@ useEffect(() => {
           {activeTab === 'addStaff' && <AddStaff staffId={staffId} setStaffId={setStaffId} staffName={staffName} setStaffName={setStaffName} staffPass={staffPass} setStaffPass={setStaffPass} staffEmail={staffEmail} setStaffEmail={setStaffEmail} staffPhone={staffPhone} setStaffPhone={setStaffPhone} staffDepartment={staffDepartment} setStaffDepartment={setStaffDepartment} staffDesignation={staffDesignation} setStaffDesignation={setStaffDesignation} allDepartments={allDepartments} addStaff={addStaff} />}
           {activeTab === 'assignStaff' && <AssignStaff assignStaffId={assignStaffId} setAssignStaffId={setAssignStaffId} assignStaffName={assignStaffName} setAssignStaffName={setAssignStaffName} assignDept={assignDept} setAssignDept={setAssignDept} assignYear={assignYear} setAssignYear={setAssignYear} assignSection={assignSection} setAssignSection={setAssignSection} assignSubject={assignSubject} setAssignSubject={setAssignSubject} allStaffs={allStaffs} allDepartments={allDepartments} allYears={allYears} allSections={allSections} allSubjects={allSubjects} assignStaff={assignStaff} />}
           {activeTab === 'sendNotification' && <SendNotification notificationTarget={notificationTarget} setNotificationTarget={setNotificationTarget} notificationMessage={notificationMessage} setNotificationMessage={setNotificationMessage} sendNotification={sendNotification} />}
+          {activeTab === 'timetable' && (
+  <TimetableScheduler
+    selectedYear={selectedYear}
+    selectedDepartment={selectedDepartment}
+    selectedSection={selectedSection}
+  />
+)}
           {activeTab === 'allUsers' && <AllUsers users={users} />}
         </div>
       </div>

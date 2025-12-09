@@ -1186,3 +1186,110 @@ tr:hover {
     font-size: 0.8rem;
   }
 }
+
+/* TIMETABLE SCHEDULER – COMPACT & CLEAN */
+.timetableScheduler { padding: 20px; max-width: 1100px; margin: 0 auto; }
+.timetableScheduler h2 { text-align: center; color: center; color: #3498db; margin-bottom: 15px; font-size: 1.9rem; }
+
+.classInfo {
+  text-align: center;
+  background: #3498db22;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-weight: bold;
+  color: #ecf0f1;
+  margin-bottom: 20px;
+}
+
+/* Form */
+.ttForm {
+  background: #2c3e50;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+  margin-bottom: 25px;
+}
+
+.ttGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.ttGrid select,
+.ttGrid input {
+  padding: 10px 12px;
+  border: none;
+  border-radius: 8px;
+  background: #34495e;
+  color: white;
+}
+
+.ttGrid select:focus,
+.ttGrid input:focus {
+  outline: 2px solid #3498db;
+  background: #3d566e;
+}
+
+.ttGrid button {
+  grid-column: 1 / -1;
+  padding: 12px;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.ttGrid button:hover { background: #2980b9; }
+
+/* Messages */
+.successMsg, .errorMsg {
+  padding: 12px;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: bold;
+  margin: 12px 0;
+}
+.successMsg { background: #27ae60; color: white; }
+.errorMsg   { background: #e74c3c; color: white; }
+
+/* Table */
+.timetablePreview {
+  background: #2c3e50;
+  padding: 20px;
+  border-radius: 12px;
+  border-radius: 12px;
+  overflow-x: auto;
+}
+
+.timetablePreview h3 { text-align: center; color: #3498db; margin-bottom: 15px; }
+
+.ttTable {
+  width: 100%;
+  min-width: 800px;
+  border-collapse: collapse;
+  background: #34495e;
+}
+
+.ttTable th, .ttTable td {
+  border: 1px solid #3498db44;
+  padding: 10px 8px;
+  text-align: center;
+  color: #ecf0f1;
+}
+
+.ttTable th {
+  background: #3498db33;
+  font-weight: bold;
+  position: sticky;
+  top: 0;
+}
+
+.ttTable th small { display: block; color: #bdc3c7; font-weight: normal; margin-top: 3px; }
+
+.ttCell strong { color: #3498db; display: block; }
+.room { color: #95a5a6; font-size: 0.85rem; }
+.emptyCell { color: #7f8c8d; font-style: italic; }
