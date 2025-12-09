@@ -410,3 +410,71 @@
     width: 90%;
   }
 }
+
+/* ——— SINGLE LOGIN BUTTON ON HOME PAGE ——— */
+.mainLoginButton {
+  display: inline-block;
+  padding: 1.1rem 3.5rem;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  font-size: 1.15rem;
+  font-weight: 700;
+  text-decoration: none;
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+}
+
+/* Shine Effect (same as your logo) */
+.mainLoginButton::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent,
+    rgba(255, 255, 255, 0.25),
+    transparent
+  );
+  transform: translateX(-100%) rotate(45deg);
+  transition: none;
+}
+
+.mainLoginButton:hover::before {
+  animation: shine 0.8s ease-in-out;
+}
+
+/* Hover States */
+.mainLoginButton:hover {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(59, 130, 246, 0.5);
+}
+
+.mainLoginButton:active {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(59, 130, 246, 0.4);
+}
+
+/* Subtle Pulse Animation (draws attention) */
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+  }
+  50% {
+    box-shadow: 0 10px 40px rgba(59, 130, 246, 0.6);
+  }
+}
+
+.mainLoginButton {
+  animation: pulseGlow 4s infinite ease-in-out;
+}

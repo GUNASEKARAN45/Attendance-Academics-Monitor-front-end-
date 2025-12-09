@@ -1,0 +1,288 @@
+/* src/styles/UnifiedLogin.module.css */
+/* This file uses YOUR original class names so it looks EXACTLY the same */
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shine {
+  0%   { transform: translateX(-100%) rotate(45deg); }
+  100% { transform: translateX(100%) rotate(45deg); }
+}
+
+@keyframes buttonSpin {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* === Use your original container === */
+.studentLoginContainer {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 1rem;
+  background-color: #4a5669;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* === Your original card === */
+.loginCard {
+  background: #374151;
+  border-radius: 10px;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  border: 1px solid #4b5563;
+  width: 100%;
+  max-width: 420px;
+  animation: fadeIn 0.7s ease-out;
+  transition: box-shadow 0.3s ease;
+}
+
+.loginCard:hover {
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.3);
+}
+
+/* Header & Logo */
+.loginHeader { text-align: center; margin-bottom: 1.5rem; }
+.loginLogo {
+  width: 50px; height: 50px;
+  background: #3b82f6;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 0.8rem;
+  box-shadow: 0 3px 10px rgba(59, 130, 246, 0.3);
+  position: relative; overflow: hidden;
+}
+.loginLogo::before {
+  content: ""; position: absolute; top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+  animation: shine 3s ease-in-out infinite;
+}
+.logoText { color: #fff; font-weight: 700; font-size: 1rem; letter-spacing: 1px; z-index: 1; }
+
+.loginTitle {
+  font-size: 1.3rem; font-weight: 700; color: #3b82f6; margin-bottom: 0.4rem;
+}
+.loginSubtitle {
+  font-size: 0.8rem; color: #9ca3af; font-weight: 400;
+}
+
+/* === ROLE SELECTOR (New but styled to match) === */
+.roleSelector {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  justify-content: center;
+}
+
+.roleBtn {
+  padding: 0.65rem 1.2rem;
+  background: #2d3748;
+  color: #9ca3af;
+  border: 1px solid #4b5563;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.roleBtn.active {
+  background: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.roleBtn:hover:not(.active) {
+  background: #374151;
+  color: white;
+}
+
+/* === Your original form styles === */
+.formGroup { margin-bottom: 1.2rem; }
+.formLabel {
+  display: block; margin-bottom: 0.4rem;
+  color: #f3f4f6; font-weight: 600; font-size: 0.8rem;
+}
+.formInput {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #4b5563;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  background: #2d3748;
+  color: #f3f4f6;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.formInput:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+.formInput::placeholder { color: #9ca3af; font-size: 0.85rem; }
+.formInput:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* Password Wrapper & Eye Icon */
+.passwordWrapper { position: relative; width: 100%; }
+.passwordWrapper .formInput { padding-right: 2.5rem; }
+.passwordToggle {
+  position: absolute; top: 50%; right: 0.75rem;
+  transform: translateY(-50%);
+  background: none; border: none; cursor: pointer;
+  color: #9ca3af; padding: 0; transition: color 0.3s ease;
+}
+.passwordToggle:hover { color: #ffffff; }
+.passwordToggle:disabled { cursor: not-allowed; opacity: 0.5; }
+
+/* Captcha Container */
+.captchaContainer {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: #2d3748;
+  border-radius: 8px;
+  border: 1px solid #4b5563;
+}
+.captchaTitle {
+  font-size: 0.8rem; font-weight: 500; color: #f3f4f6;
+  margin-bottom: 0.6rem; text-align: center;
+}
+
+/* Error Message */
+.errorMessage {
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+  padding: 0.8rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  text-align: center;
+  margin: 1rem 0;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* Login Button */
+.loginButton {
+  width: 100%;
+  padding: 0.8rem;
+  background: #3b82f6;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+.loginButton:hover:not(:disabled) {
+  filter: brightness(1.1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+.loginButton:active:not(:disabled) {
+  transform: scale(0.95);
+}
+.loginButton:disabled { opacity: 0.6; cursor: not-allowed; }
+.buttonLoading { position: relative; color: transparent; }
+.buttonLoading::after {
+  content: "";
+  position: absolute; width: 18px; height: 18px;
+  top: 50%; left: 50%; margin-left: -9px; margin-top: -9px;
+  border: 2px solid transparent; border-top: 2px solid #ffffff;
+  border-radius: 50%; animation: buttonSpin 1s linear infinite;
+}
+
+/* Footer */
+.loginFooter {
+  text-align: center; margin-top: 1.5rem; padding-top: 1rem;
+  border-top: 1px solid #4b5563;
+}
+.footerText {
+  font-size: 0.8rem; color: #9ca3af; font-weight: 400;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .loginCard { padding: 1.5rem; margin: 0.8rem; }
+  .loginTitle { font-size: 1.2rem; }
+  .roleSelector { flex-direction: column; }
+  .roleBtn { padding: 0.8rem; }
+}
+/* ——— CUSTOM DROPDOWN (Perfectly Matches Your Theme) ——— */
+.dropdownWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.dropdownToggle {
+  width: 100%;
+  padding: 0.8rem;
+  background: #2d3748;
+  border: 1px solid #4b5563;
+  border-radius: 6px;
+  color: #f3f4f6;
+  font-size: 0.85rem;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.3s ease;
+}
+
+.dropdownToggle:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.dropdownToggle:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.dropdownToggle svg {
+  font-size: 1rem;
+  transition: transform 0.3s ease;
+}
+
+.dropdownToggle svg.rotate {
+  transform: rotate(180deg);
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #374151;
+  border: 1px solid #4b5563;
+  border-top: none;
+  border-radius: 0 0 6px 6px;
+  margin-top: 2px;
+  z-index: 10;
+  overflow: hidden;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+  animation: fadeIn 0.2s ease-out;
+}
+
+.dropdownItem {
+  padding: 0.8rem;
+  color: #cbd5e1;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.85rem;
+}
+
+.dropdownItem:hover {
+  background: #3b82f6;
+  color: white;
+}
+
+.dropdownItem.selected {
+  background: #3b82f6;
+  color: white;
+  font-weight: 600;
+}

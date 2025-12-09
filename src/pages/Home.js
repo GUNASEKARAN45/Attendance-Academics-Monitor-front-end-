@@ -88,17 +88,12 @@ export default function Home() {
           Attenitix is a cutting-edge Attendance and Analytics System designed to streamline attendance tracking and provide actionable insights for educational institutions. With real-time data, intuitive dashboards, and secure access for students, staff, and admins, it enhances efficiency and decision-making.
         </p>
 
-        <div className={styles.buttonGroup}>
-          <Link to="/login/student_login" className={`${styles.loginButton} ${styles.studentButton}`}>
-            Student Login
-          </Link>
-          <Link to="/login/staff_login" className={`${styles.loginButton} ${styles.staffButton}`}>
-            Staff Login
-          </Link>
-          <Link to="/login/admin_login" className={`${styles.loginButton} ${styles.adminButton}`}>
-            Admin Login
-          </Link>
-        </div>
+        {/* Replace the entire buttonGroup with this single button */}
+<div className={styles.buttonGroup}>
+  <Link to="/login" className={styles.mainLoginButton}>
+    Login to Dashboard
+  </Link>
+</div>
 
         <div className={styles.slideshowContainer}>
           <div className={styles.slideshow}>

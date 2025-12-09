@@ -1,7 +1,6 @@
 import React from 'react';
 import styles from '../../styles/StudentDashboard.module.css';
 
-
 const TodayAttendance = () => {
   const attendanceData = {
     today: [true, false, true, true, true, false, true]
@@ -14,7 +13,7 @@ const TodayAttendance = () => {
         {attendanceData.today.map((present, index) => (
           <div key={index} className={styles.periodDot}>
             <div className={`${styles.dot} ${present ? styles.present : styles.absent}`}>
-              {index + 1}
+              {present ? 'P' : 'A'}
             </div>
             <span>P{index + 1}</span>
           </div>

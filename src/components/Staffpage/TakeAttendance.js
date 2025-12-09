@@ -10,7 +10,7 @@ const TakeAttendance = ({ selectedDepartment, selectedYear, selectedSection, sel
   const [inputToken, setInputToken] = useState('');
   const [pairing, setPairing] = useState(false);
   const [qrCode, setQrCode] = useState('');
-  const cameras = ['Camera1 (MAC: 00:14:22:01:23:45) [ECE-A]', 'Camera2 (MAC: 00:14:22:01:23:46) [ECE-B]', 'Camera3 (MAC: 00:14:22:01:23:47) [CN LAB]'];
+  const cameras = ['Camera1 (192.168.1.x) [ECE-A]', 'Camera2 (192.168.0.x) [ECE-B]'];
   const [endTimeOptions, setEndTimeOptions] = useState([]);
 
   const periodStartTimes = {
