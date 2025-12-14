@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from '../styles/StaffDashboard.module.css';
 
+
 // Components
 import ProfilePopup from '../components/Staffpage/ProfilePopup';
 import StudentPopup from '../components/Staffpage/StudentPopup';
@@ -16,6 +17,7 @@ import AcademicInsights from '../components/Staffpage/AcademicInsights';
 import StudentInsights from '../components/Staffpage/StudentInsights';
 import TakeAttendance from '../components/Staffpage/TakeAttendance';
 import ExamScheduler from '../components/Staffpage/ExamScheduler';
+
 
 import { api } from '../Api';
 

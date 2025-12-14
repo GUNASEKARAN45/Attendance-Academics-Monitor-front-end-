@@ -1514,3 +1514,59 @@ tr:hover {
   font-size: 1.1rem;
   box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
 }
+
+/* TIMETABLE VIEW – COMPACT & CLEAN */
+.timetableCard {
+  background: #2c3e50;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+  margin: 20px 0;
+}
+
+.timetableCard h3 {
+  text-align: center;
+  color: #3498db;
+  margin-bottom: 10px;
+}
+
+.classTag {
+  text-align: center;
+  color: #bdc3c7;
+  font-size: 1.1rem;
+  margin-bottom: 20px;
+}
+
+.tableWrapper { overflow-x: auto; }
+.ttTable {
+  width: 100%;
+  min-width: 750px;
+  border-collapse: collapse;
+  background: #34495e;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.ttTable th, .ttTable td {
+  border: 1px solid #3498db44;
+  padding: 10px 8px;
+  text-align: center;
+  color: #ecf0f1;
+}
+
+.ttTable th {
+  background: #3498db33;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.ttTable th small {
+  display: block;
+  color: #bdc3c7;
+  font-weight: normal;
+}
+
+.ttCell strong { color: #3498db; display: block; font-size: 1rem; }
+.ttCell div { font-size: 0.9rem; }
+.room { color: #95a5a6; font-size: 0.8rem; }
+.emptyCell { color: #7f8c8d; font-style: italic; }
