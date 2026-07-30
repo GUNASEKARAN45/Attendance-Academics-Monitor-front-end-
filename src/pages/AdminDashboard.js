@@ -15,6 +15,7 @@ import CombinedAttendanceChart from '../components/Adminpage/CombinedAttendanceC
 import MarksTable from '../components/Adminpage/MarksTable';
 import AcademicInsights from '../components/Adminpage/AcademicInsights';
 import StudentsList from '../components/Adminpage/StudentsList';
+import StudentSearch from '../components/Adminpage/StudentSearch';
 import AllUsers from '../components/Adminpage/AllUsers';
 import TimetableScheduler from '../components/Adminpage/TimetableScheduler';
 
@@ -509,6 +510,9 @@ useEffect(() => {
             <button className={`${styles.tabBtn} ${activeTab === 'students' ? styles.active : ''}`} onClick={() => setActiveTab('students')}>
               Students Analysis
             </button>
+            <button className={`${styles.tabBtn} ${activeTab === 'studentSearch' ? styles.active : ''}`} onClick={() => setActiveTab('studentSearch')}>
+              Student Search
+            </button>
             <button className={`${styles.tabBtn} ${activeTab === 'addStudent' ? styles.active : ''}`} onClick={() => setActiveTab('addStudent')}>
               Add Student
             </button>
@@ -658,6 +662,7 @@ useEffect(() => {
     setShowStudentPopup={setShowStudentPopup}
   />
 )}
+          {activeTab === 'studentSearch' && <StudentSearch />}
           {activeTab === 'addStudent' && (
             <AddStudent
               studentReg={studentReg} setStudentReg={setStudentReg}
