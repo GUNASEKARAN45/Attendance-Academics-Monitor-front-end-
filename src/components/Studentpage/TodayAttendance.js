@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styles from '../../styles/StudentDashboard.module.css';
-import axios from 'axios';
+import { api } from '../../Api';
 
 const TodayAttendance = () => {
   const [periods, setPeriods] = useState(Array(7).fill(null)); // [true, false, null...]
@@ -9,10 +9,7 @@ const TodayAttendance = () => {
   useEffect(() => {
     const fetchAttendance = async () => {
       try {
-        const token = localStorage.getItem("token");
-        const response = await axios.get("/api/student/today-attendance", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const response = await api.get("/student/today-attendance");
 
         setPeriods(response.data.periods);
         setLoading(false);
