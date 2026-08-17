@@ -17,6 +17,7 @@ import AcademicInsights from '../components/Staffpage/AcademicInsights';
 import StudentInsights from '../components/Staffpage/StudentInsights';
 import TakeAttendance from '../components/Staffpage/TakeAttendance';
 import ExamScheduler from '../components/Staffpage/ExamScheduler';
+import NotesSection from '../components/Staffpage/NotesSection';
 
 
 import { api } from '../Api';
@@ -310,6 +311,18 @@ const StaffDashboard = () => {
           {/* Tab Content */}
           {activeTab === 'attendance' && (
             <>
+              <TakeAttendance
+                selectedYear={selectedYear}
+                selectedDepartment={selectedDepartment}
+                selectedSection={selectedSection}
+                selectedSubject={selectedSubject}
+              />
+              <NotesSection
+                selectedDepartment={selectedDepartment}
+                selectedYear={selectedYear}
+                selectedSection={selectedSection}
+                selectedSubject={selectedSubject}
+              />
               <TodayAttendance
                 todayAttendanceData={todayAttendanceData}
                 setShowEditAttendance={setShowEditAttendance}
